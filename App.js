@@ -1,7 +1,26 @@
 import { useEffect, useState } from 'react';
 import { SafeAreaView, StatusBar } from 'react-native';
+import * as SecureStore from 'expo-secure-store';
 import { AppShell, AuthScreen, OnboardingScreen, SplashScreen } from './src/screens/AppScreens';
 import { demoProducts } from './src/data/mockData';
+
+const STORAGE_KEY = 'mora-marketplace-state';
+
+function restoreCart(savedCart = []) {
+  return savedCart.reduce((items, savedItem) => {
+    const product = demoProducts.find(({ id }) => id === savedItem.id);
+    return product ? [...items, { ...product, quantity: savedItem.quantity }] : items;
+  }, []);
+}
+
+function serializeState({ user, cart, wishlist, orders }) {
+  return JSON.stringify({
+    user,
+    wishlist,
+    orders,
+    cart: cart.map(({ id, quantity }) => ({ id, quantity })),
+  });
+}
 
 export default function App() {
   const [stage, setStage] = useState('splash');
@@ -9,8 +28,39 @@ export default function App() {
   const [cart, setCart] = useState([]);
   const [wishlist, setWishlist] = useState([]);
   const [orders, setOrders] = useState([]);
+  const [isHydrated, setIsHydrated] = useState(false);
 
-  useEffect(() => { const timer = setTimeout(() => setStage('onboarding'), 900); return () => clearTimeout(timer); }, []);
+  useEffect(() => {
+    const timer = setTimeout(() => setStage((current) => current === 'splash' ? 'onboarding' : current), 900);
+    return () => clearTimeout(timer);
+  }, []);
+
+  useEffect(() => {
+    let isMounted = true;
+    const hydrateState = async () => {
+      try {
+        const savedState = await SecureStore.getItemAsync(STORAGE_KEY);
+        if (!savedState || !isMounted) return;
+        const { user: savedUser, cart: savedCart, wishlist: savedWishlist, orders: savedOrders } = JSON.parse(savedState);
+        setUser(savedUser || null);
+        setCart(restoreCart(savedCart));
+        setWishlist(savedWishlist || []);
+        setOrders(savedOrders || []);
+        if (savedUser) setStage('app');
+      } catch {
+        // Continue with a fresh session if local storage is unavailable or invalid.
+      } finally {
+        if (isMounted) setIsHydrated(true);
+      }
+    };
+    hydrateState();
+    return () => { isMounted = false; };
+  }, []);
+
+  useEffect(() => {
+    if (!isHydrated) return;
+    SecureStore.setItemAsync(STORAGE_KEY, serializeState({ user, cart, wishlist, orders })).catch(() => {});
+  }, [cart, isHydrated, orders, user, wishlist]);
   const addToCart = (product) => setCart((items) => {
     const found = items.find((item) => item.id === product.id);
     return found ? items.map((item) => item.id === product.id ? { ...item, quantity: item.quantity + 1 } : item) : [...items, { ...product, quantity: 1 }];
@@ -19,7 +69,7 @@ export default function App() {
   const completeOrder = () => {
     if (!cart.length) return;
     const total = cart.reduce((sum, item) => sum + item.price * item.quantity, 0);
-    setOrders((items) => [{ id: `MRA-${Date.now().toString().slice(-6)}`, items: cart, total, status: 'Diproses' }, ...items]);
+    setOrders((items) => [{ id: `MRA-${Date.now().toString().slice(-6)}`, items: cart.map(({ id, quantity }) => ({ id, quantity })), total, status: 'Diproses' }, ...items]);
     setCart([]);
   };
 
