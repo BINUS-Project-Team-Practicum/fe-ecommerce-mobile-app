@@ -1,6 +1,22 @@
-import { Image, ImageBackground, Pressable, ScrollView, Text, TextInput, View } from "react-native";
-import { categories } from "../../data/mockData";
-import { Button, Chip, IconButton, SectionTitle, colors } from "../../components/ui";
+import {
+  Image,
+  ImageBackground,
+  Pressable,
+  ScrollView,
+  Text,
+  TextInput,
+  useWindowDimensions,
+  View,
+} from "react-native";
+import { categories, money } from "../../data/mockData";
+import {
+  Button,
+  Chip,
+  IconButton,
+  ProductCard,
+  SectionTitle,
+  colors,
+} from "../../components/ui";
 import { Header } from "../shared/MarketplaceComponents";
 import { sans, styles } from "../shared/marketplaceStyles";
 
@@ -142,9 +158,9 @@ export function HomeScreen({
             <View style={styles.referenceCategoryIcon}>
               <Text style={styles.referenceCategoryEmoji}>{icon}</Text>
             </View>
-            <Text numberOfLines={1} style={styles.referenceCategoryText}>
+            {/* <Text numberOfLines={1} style={styles.referenceCategoryText}>
               {label}
-            </Text>
+            </Text> */}
           </Pressable>
         ))}
       </View>
@@ -230,7 +246,7 @@ function ReferenceProduct({ product, onPress, wishlisted, onWish }) {
           }}
           style={styles.referenceHeart}
         >
-          <Text style={{ color: "#94A3B8", fontSize: 21 }}>
+          <Text style={{ color: "#94A3B8", fontSize: 16 }}>
             {wishlisted ? "♥" : "♡"}
           </Text>
         </Pressable>
@@ -265,6 +281,10 @@ function MiniProduct({ product, onPress }) {
   );
 }
 function ProductGrid({ products, wishlist, onWishlist, onPress }) {
+  const { width } = useWindowDimensions();
+  const columnCount = width >= 768 ? 3 : 2;
+  const gap = 10;
+  const cardWidth = (width - 32 - gap * (columnCount - 1)) / columnCount;
   return (
     <View style={styles.grid}>
       {products.map((p) => (
@@ -274,6 +294,8 @@ function ProductGrid({ products, wishlist, onWishlist, onPress }) {
           onPress={() => onPress(p)}
           wishlisted={wishlist.includes(p.id)}
           onWishlist={() => onWishlist(p.id)}
+          style={{ width: cardWidth, flexGrow: 0, flexShrink: 0 }}
+          imageStyle={{ height: cardWidth * 1.05 }}
         />
       ))}
     </View>
@@ -293,36 +315,83 @@ export function SearchScreen({
       p.name.toLowerCase().includes(query.toLowerCase()) ||
       p.store.toLowerCase().includes(query.toLowerCase()),
   );
+  const recentSearches = [
+    "wireless headphones",
+    "running shoes",
+    "minimal watch",
+    "coffee maker",
+  ];
+  const trending = [
+    "Air Max",
+    "Smart Watch",
+    "Noise Cancelling",
+    "Leather Bag",
+  ];
   return (
     <View style={styles.page}>
-      <View style={styles.toolbar}>
-        <Pressable onPress={() => navigate("home")}>
-          <Text style={styles.back}>‹</Text>
+      <View style={styles.searchToolbar}>
+        <Pressable
+          onPress={() => navigate("home")}
+          style={styles.searchRoundButton}
+        >
+          <Text style={styles.searchBack}>‹</Text>
         </Pressable>
-        <View style={styles.searchInput}>
-          <Text>⌕</Text>
+        <View style={styles.referenceSearchInput}>
+          <Text style={styles.searchMagnifier}>⌕</Text>
           <TextInputProxy value={query} onChange={setQuery} />
         </View>
-        <Pressable onPress={() => {}}>
+        <Pressable onPress={() => {}} style={styles.searchRoundButton}>
           <Text style={styles.filter}>☷</Text>
         </Pressable>
       </View>
       <ScrollView
         horizontal
         showsHorizontalScrollIndicator={false}
-        contentContainerStyle={styles.chips}
+        style={styles.searchCategoriesContainer}
+        contentContainerStyle={styles.searchCategories}
       >
-        <Chip label="Semua" active />
-        <Chip label="Gratis ongkir" />
-        <Chip label="Official Store" />
-        <Chip label="Rating 4.5+" />
+        <Chip label="All" active />
+        <Chip label="Electronics" />
+        <Chip label="Fashion" />
+        <Chip label="Home" />
+        <Chip label="Sports" />
       </ScrollView>
       <ScrollView contentContainerStyle={styles.scroll}>
-        <Text style={styles.resultCount}>
-          {query
-            ? `${filtered.length} hasil untuk “${query}”`
-            : "Produk terpopuler"}
-        </Text>
+        {!query && (
+          <>
+            <Text style={styles.searchGroupTitle}>RECENT SEARCHES</Text>
+            <View style={styles.recentSearches}>
+              {recentSearches.map((item) => (
+                <Pressable
+                  key={item}
+                  onPress={() => setQuery(item)}
+                  style={styles.recentChip}
+                >
+                  <Text style={styles.recentIcon}>◷</Text>
+                  <Text style={styles.recentText}>{item}</Text>
+                </Pressable>
+              ))}
+            </View>
+            <Text style={styles.searchGroupTitle}>TRENDING</Text>
+            <View style={styles.trendingSearches}>
+              {trending.map((item) => (
+                <Pressable
+                  key={item}
+                  onPress={() => setQuery(item)}
+                  style={styles.trendingChip}
+                >
+                  <Text style={styles.trendingIcon}>↗</Text>
+                  <Text style={styles.trendingText}>{item}</Text>
+                </Pressable>
+              ))}
+            </View>
+          </>
+        )}
+        {query ? (
+          <Text style={styles.resultCount}>
+            {filtered.length} results for “{query}”
+          </Text>
+        ) : null}
         <ProductGrid
           products={filtered}
           wishlist={wishlist}
@@ -340,9 +409,15 @@ function TextInputProxy({ value, onChange }) {
       autoFocus
       value={value}
       onChangeText={onChange}
-      placeholder="Cari di mora"
+      placeholder="Search products..."
       placeholderTextColor="#9CA3AF"
-      style={{ flex: 1, color: colors.text }}
+      style={{
+        flex: 1,
+        color: colors.text,
+        fontFamily: sans,
+        fontSize: 14,
+        fontWeight: "500",
+      }}
     />
   );
 }

@@ -1,4 +1,4 @@
-import { Image, Pressable, Text, View } from "react-native";
+import { Image, Pressable, Text, useWindowDimensions, View } from "react-native";
 import { money } from "../../data/mockData";
 import { Button, ProductCard, colors } from "../../components/ui";
 import { styles } from "./marketplaceStyles";
@@ -56,6 +56,10 @@ export function MiniProduct({ product, onPress }) {
   );
 }
 export function ProductGrid({ products, wishlist, onWishlist, onPress }) {
+  const { width } = useWindowDimensions();
+  const columnCount = width >= 768 ? 3 : 2;
+  const gap = 10;
+  const cardWidth = (width - 32 - gap * (columnCount - 1)) / columnCount;
   return (
     <View style={styles.grid}>
       {products.map((p) => (
@@ -65,6 +69,8 @@ export function ProductGrid({ products, wishlist, onWishlist, onPress }) {
           onPress={() => onPress(p)}
           wishlisted={wishlist.includes(p.id)}
           onWishlist={() => onWishlist(p.id)}
+          style={{ width: cardWidth, flexGrow: 0, flexShrink: 0 }}
+          imageStyle={{ height: cardWidth * 1.05 }}
         />
       ))}
     </View>
