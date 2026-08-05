@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { Alert, Image, Pressable, ScrollView, Text, View } from "react-native";
 import { money } from "../../data/mockData";
-import { Button, Chip, EmptyState, IconButton, QuantitySelector, Rating, SectionTitle } from "../../components/ui";
+import { Button, EmptyState, QuantitySelector, Rating } from "../../components/ui";
 import { Header } from "../shared/MarketplaceComponents";
 import { styles } from "../shared/marketplaceStyles";
 
@@ -21,11 +21,16 @@ export function ProductDetailScreen({
         onAction={() => navigate("home")}
       />
     );
-  const [variant, setVariant] = useState("Hitam");
+  const [variant, setVariant] = useState("Midnight Black");
+  const [quantity, setQuantity] = useState(1);
+  const [activeTab, setActiveTab] = useState("description");
+  const addSelectedProduct = () => {
+    Array.from({ length: quantity }).forEach(() => onAddToCart(p));
+  };
   return (
     <View style={styles.page}>
       <ScrollView
-        contentContainerStyle={[styles.scroll, { paddingBottom: 105 }]}
+        contentContainerStyle={{ paddingBottom: 106 }}
       >
         <View style={styles.detailTop}>
           <Pressable
@@ -34,92 +39,132 @@ export function ProductDetailScreen({
           >
             <Text style={styles.back}>‹</Text>
           </Pressable>
-          <Pressable
-            onPress={() => onToggleWishlist(p.id)}
-            style={styles.floatingHeart}
-          >
-            <Text>{wishlist.includes(p.id) ? "♥" : "♡"}</Text>
-          </Pressable>
-        </View>
-        <Image source={{ uri: p.image }} style={styles.detailImage} />
-        <View style={styles.detailBody}>
-          <Text style={styles.detailPrice}>{money(p.price)}</Text>
-          <Text style={styles.detailName}>{p.name}</Text>
-          <View style={styles.detailMeta}>
-            <Rating value={p.rating} />
-            <Text style={styles.metaSep}> · {p.sold} terjual</Text>
+          <View style={styles.detailTopActions}>
+            <Pressable style={styles.floatingAction}>
+              <Text style={styles.detailActionIcon}>♧</Text>
+            </Pressable>
+            <Pressable
+              onPress={() => onToggleWishlist(p.id)}
+              style={styles.floatingAction}
+            >
+              <Text style={styles.detailActionIcon}>
+                {wishlist.includes(p.id) ? "♥" : "♡"}
+              </Text>
+            </Pressable>
           </View>
-          <View style={styles.detailLine} />
-          <Text style={styles.label}>Pilih warna</Text>
-          <View style={styles.variantRow}>
-            {["Hitam", "Putih", "Hijau"].map((v) => (
-              <Chip
-                key={v}
-                label={v}
-                active={variant === v}
-                onPress={() => setVariant(v)}
-              />
+        </View>
+        <View style={styles.detailGallery}>
+          <Image source={{ uri: p.image }} style={styles.detailImage} />
+          <View style={styles.detailThumbnails}>
+            {[0, 1, 2].map((item) => (
+              <View
+                key={item}
+                style={[
+                  styles.detailThumbnail,
+                  item === 0 && styles.detailThumbnailActive,
+                ]}
+              >
+                <Image source={{ uri: p.image }} style={styles.thumbnailImage} />
+              </View>
             ))}
           </View>
-          <InfoRow
-            icon="▣"
-            title="Pengiriman"
-            body={`Dari ${p.location} · Estimasi 2–4 hari`}
-          />
-          <InfoRow
-            icon="⌑"
-            title="Voucher toko"
-            body="Hemat Rp15.000 min. pembelian Rp150.000"
-          />
-          <View style={styles.storeRow}>
-            <Text style={styles.storeAvatar}>{p.store[0]}</Text>
-            <View style={{ flex: 1 }}>
-              <Text style={styles.storeName}>{p.store}</Text>
-              <Text style={styles.storeInfo}>{p.badge} · Online</Text>
+          <View style={styles.galleryCount}>
+            <Text style={styles.galleryCountText}>1/3</Text>
+          </View>
+        </View>
+        <View style={styles.detailBody}>
+          <Text style={styles.detailStore}>
+            {p.store} <Text style={styles.detailOfficial}>· {p.badge}</Text>
+          </Text>
+          <Text style={styles.detailName}>{p.name}</Text>
+          <View style={styles.detailPriceRow}>
+            <Text style={styles.detailPrice}>{money(p.price)}</Text>
+            <Text style={styles.detailOldPrice}>{money(p.oldPrice)}</Text>
+            <Text style={styles.detailDiscount}>-{p.discount}%</Text>
+          </View>
+          <View style={styles.detailMeta}>
+            <Text style={styles.detailStars}>★★★★<Text style={styles.detailStarMuted}>★</Text></Text>
+            <Text style={styles.detailRating}>{p.rating} ({p.sold})</Text>
+            <Text style={styles.detailSold}>{p.sold} sold</Text>
+          </View>
+          <View style={styles.detailSection}>
+            <Text style={styles.variantLabel}>Color: <Text style={styles.variantValue}>{variant}</Text></Text>
+            <View style={styles.variantRow}>
+              {[
+                ["Midnight Black", "#151515"],
+                ["Pearl White", "#F4F4F5"],
+                ["Navy Blue", "#1E3A5F"],
+              ].map(([name, color]) => (
+                <Pressable
+                key={name}
+                  onPress={() => setVariant(name)}
+                  style={[
+                    styles.colorSwatch,
+                    { backgroundColor: color },
+                    variant === name && styles.colorSwatchActive,
+                  ]}
+                />
+              ))}
             </View>
-            <Button
-              label="Kunjungi"
-              small
-              variant="outline"
-              onPress={() => navigate("store")}
-            />
           </View>
-          <SectionTitle title="Deskripsi produk" />
-          <Text style={styles.description}>{p.description}</Text>
-          <SectionTitle title="Spesifikasi" />
-          <View style={styles.spec}>
-            <Text style={styles.specKey}>Kondisi</Text>
-            <Text style={styles.specValue}>Baru</Text>
+          <View style={styles.quantityRow}>
+            <Text style={styles.quantityLabel}>Quantity</Text>
+            <View style={styles.detailQuantityControl}>
+              <Pressable onPress={() => setQuantity(Math.max(1, quantity - 1))} style={styles.detailQuantityButton}>
+                <Text style={styles.detailQuantitySign}>−</Text>
+              </Pressable>
+              <Text style={styles.detailQuantityValue}>{quantity}</Text>
+              <Pressable onPress={() => setQuantity(quantity + 1)} style={[styles.detailQuantityButton, styles.detailQuantityAdd]}>
+                <Text style={styles.detailQuantityAddText}>+</Text>
+              </Pressable>
+            </View>
           </View>
-          <View style={styles.spec}>
-            <Text style={styles.specKey}>Stok</Text>
-            <Text style={styles.specValue}>Tersedia</Text>
+          <View style={styles.benefitPanel}>
+            <View style={styles.benefitPrimary}>
+              <Text style={styles.benefitIcon}>▱</Text>
+              <Text style={styles.benefitTitle}>Free Shipping</Text>
+              <Text style={styles.benefitCopy}>Est. delivery 2–4 days</Text>
+            </View>
+            <View style={styles.benefitSecondary}>
+              <Text>♢  Buyer Protection</Text>
+              <Text>↻  Free Returns</Text>
+            </View>
           </View>
-          <SectionTitle title="Ulasan pembeli" action="Lihat semua" />
-          <View style={styles.review}>
-            <Rating value="4.9" />
-            <Text style={styles.description}>
-              Produk sesuai foto dan kualitasnya sangat baik. Pengiriman juga
-              cepat!
-            </Text>
-            <Text style={styles.storeInfo}>Rani · 2 hari lalu</Text>
+          <Pressable style={styles.couponRow}>
+            <Text style={styles.couponIcon}>♧</Text>
+            <Text style={styles.couponText}>Hemat ekstra 25% dengan kupon</Text>
+            <Text style={styles.couponClaim}>Claim</Text>
+          </Pressable>
+          <View style={styles.detailTabs}>
+            {[
+              ["description", "Description"],
+              ["specs", "Specs"],
+              ["reviews", "Reviews"],
+            ].map(([id, label]) => (
+              <Pressable key={id} onPress={() => setActiveTab(id)} style={styles.detailTab}>
+                <Text style={[styles.detailTabText, activeTab === id && styles.detailTabTextActive]}>{label}</Text>
+                {activeTab === id && <View style={styles.detailTabIndicator} />}
+              </Pressable>
+            ))}
           </View>
+          {activeTab === "description" && <Text style={styles.detailDescription}>{p.description}</Text>}
+          {activeTab === "specs" && <View style={styles.detailSpecs}><Text style={styles.specKey}>Kondisi</Text><Text style={styles.specValue}>Baru</Text><Text style={styles.specKey}>Asal pengiriman</Text><Text style={styles.specValue}>{p.location}</Text></View>}
+          {activeTab === "reviews" && <View style={styles.detailReview}><Rating value={p.rating} /><Text style={styles.detailDescription}>Produk sesuai foto dan kualitasnya sangat baik.</Text></View>}
         </View>
       </ScrollView>
       <View style={styles.stickyCta}>
-        <IconButton icon="♧" onPress={() => navigate("chat")} />
         <Button
           label="+ Keranjang"
           variant="outline"
           onPress={() => {
-            onAddToCart(p);
+            addSelectedProduct();
             Alert.alert("Ditambahkan", "Produk masuk ke keranjang Anda.");
           }}
         />
         <Button
           label="Beli sekarang"
           onPress={() => {
-            onAddToCart(p);
+            addSelectedProduct();
             navigate("checkout");
           }}
         />

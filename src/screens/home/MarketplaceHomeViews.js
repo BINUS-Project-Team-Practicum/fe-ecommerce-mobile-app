@@ -11,6 +11,7 @@ import {
 import { categories, money } from "../../data/mockData";
 import {
   Button,
+  Badge,
   Chip,
   IconButton,
   ProductCard,
@@ -23,9 +24,8 @@ import { sans, styles } from "../shared/marketplaceStyles";
 export function BottomNav({ page, setPage }) {
   const nav = [
     ["home", "⌂", "Beranda"],
-    ["categories", "▦", "Kategori"],
+    ["explore", "◈", "Explore"],
     ["wishlist", "♡", "Favorit"],
-    ["notifications", "♧", "Notifikasi"],
     ["profile", "◉", "Akun"],
   ];
   return (
@@ -61,8 +61,8 @@ export function HomeScreen({
         <View style={styles.delivery}>
           <Text style={styles.pin}>⌖</Text>
           <Text style={styles.deliveryText}>
-            Deliver to{" "}
-            <Text style={styles.deliveryStrong}>San Francisco, CA</Text>⌄
+            Dikirim ke{" "}
+            <Text style={styles.deliveryStrong}>Jakarta Selatan</Text>⌄
           </Text>
         </View>
         <View style={styles.headerIcons}>
@@ -80,7 +80,7 @@ export function HomeScreen({
       >
         <Text style={styles.referenceSearchIcon}>⌕</Text>
         <Text style={styles.referenceSearchText}>
-          Search products, stores...
+          Cari produk, brand, atau toko
         </Text>
         <View style={styles.aiChip}>
           <Text style={styles.aiText}>AI</Text>
@@ -95,13 +95,13 @@ export function HomeScreen({
       >
         <View style={styles.heroOverlay}>
           <Text style={styles.referenceHeroTitle}>
-            Summer Sale Up to 70% OFF
+            Momen Hemat Hingga 70%
           </Text>
           <Text style={styles.referenceHeroCopy}>
-            Limited time offer on thousands of products
+            Temukan pilihan terbaik untuk harimu
           </Text>
           <Button
-            label="Shop Now  →"
+            label="Belanja sekarang  →"
             variant="outline"
             small
             onPress={() => navigate("search")}
@@ -127,7 +127,7 @@ export function HomeScreen({
             <Text>45</Text>
           </View>
         </View>
-        <Text style={styles.seeAll}>See all ›</Text>
+          <Text style={styles.seeAll}>Lihat semua ›</Text>
       </View>
       <ScrollView
         horizontal
@@ -158,9 +158,9 @@ export function HomeScreen({
             <View style={styles.referenceCategoryIcon}>
               <Text style={styles.referenceCategoryEmoji}>{icon}</Text>
             </View>
-            {/* <Text numberOfLines={1} style={styles.referenceCategoryText}>
+            <Text numberOfLines={1} style={styles.referenceCategoryText}>
               {label}
-            </Text> */}
+            </Text>
           </Pressable>
         ))}
       </View>
@@ -169,7 +169,7 @@ export function HomeScreen({
           <Text style={{ color: "#3B82F6" }}>↗</Text>
           <Text style={styles.referenceHeading}>Best Sellers</Text>
         </View>
-        <Text style={styles.seeAll}>See all ›</Text>
+        <Text style={styles.seeAll}>Lihat semua ›</Text>
       </View>
       <ScrollView
         horizontal
@@ -218,12 +218,39 @@ export function HomeScreen({
           ),
         )}
       </ScrollView>
+      <View style={styles.personalizedHeader}>
+        <View>
+          <Text style={styles.personalizedEyebrow}>DIPILIH UNTUKMU</Text>
+          <Text style={styles.personalizedTitle}>Temukan yang kamu suka</Text>
+        </View>
+        <Badge label="Untukmu" tone="info" />
+      </View>
+      <View style={styles.recommendGrid}>
+        {products.slice(2, 6).map((p) => (
+          <ProductCard
+            key={`for-you-${p.id}`}
+            product={p}
+            onPress={() => navigate("detail", p)}
+            wishlisted={wishlist.includes(p.id)}
+            onWishlist={() => onToggleWishlist(p.id)}
+            style={styles.recommendCard}
+            imageStyle={styles.recommendImage}
+          />
+        ))}
+      </View>
+      <View style={styles.trustStrip}>
+        <Text style={styles.trustIcon}>✓</Text>
+        <View style={{ flex: 1 }}>
+          <Text style={styles.trustTitle}>Belanja nyaman bersama mora.</Text>
+          <Text style={styles.trustCopy}>Pembayaran aman · Produk terkurasi · Bantuan 24/7</Text>
+        </View>
+      </View>
       <View style={styles.infoBanner}>
-        <Text style={styles.infoBannerTitle}>Shop smarter with an account</Text>
+        <Text style={styles.infoBannerTitle}>Belanja lebih personal dengan akun</Text>
         <Text style={styles.infoBannerText}>
-          Get personalized product recommendations.
+          Dapatkan rekomendasi, voucher, dan status pesananmu.
         </Text>
-        <Button label="Sign In" small onPress={onLogin} />
+        <Button label="Masuk" small onPress={onLogin} />
       </View>
     </ScrollView>
   );

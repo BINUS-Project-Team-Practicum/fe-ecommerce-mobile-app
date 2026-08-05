@@ -14,7 +14,7 @@ export function AppShell(props) {
   const [query, setQuery] = useState("");
   const navigate = (to, product) => { if (product) setSelected(product); setPage(to); };
   const screenProps = { ...props, navigate, selected, query, setQuery };
-  const content = page === "home" ? <HomeScreen {...screenProps} /> : page === "search" ? <SearchScreen {...screenProps} /> : page === "detail" ? <ProductDetailScreen {...screenProps} /> : page === "cart" ? <CartScreen {...screenProps} /> : page === "checkout" ? <CheckoutScreen {...screenProps} /> : page === "success" ? <OrderSuccessScreen {...screenProps} /> : page === "categories" ? <CategoriesScreen {...screenProps} /> : <AccountUtilityScreen page={page} {...screenProps} />;
-  const showBottomNav = ["home", "categories", "wishlist", "notifications", "profile"].includes(page);
+  const content = page === "home" ? <HomeScreen {...screenProps} /> : (page === "search" || page === "explore") ? <SearchScreen {...screenProps} /> : page === "detail" ? <ProductDetailScreen {...screenProps} /> : page === "cart" ? <CartScreen {...screenProps} /> : page === "checkout" ? <CheckoutScreen {...screenProps} /> : page === "success" ? <OrderSuccessScreen {...screenProps} /> : page === "categories" ? <CategoriesScreen {...screenProps} /> : <AccountUtilityScreen page={page} {...screenProps} />;
+  const showBottomNav = ["home", "explore", "wishlist", "profile"].includes(page);
   return <View style={{ flex: 1, backgroundColor: colors.background }}>{content}{showBottomNav && <BottomNav page={page} setPage={setPage} />}</View>;
 }
