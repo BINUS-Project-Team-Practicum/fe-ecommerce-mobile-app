@@ -1,4 +1,5 @@
-import { Alert, Pressable, ScrollView, Text, View } from "react-native";
+import { useState } from "react";
+import { Alert, Pressable, ScrollView, Switch, Text, View } from "react-native";
 import { EmptyState, Button, SectionTitle, colors } from "../../components/ui";
 import { ProductGrid } from "../shared/MarketplaceComponents";
 import { styles } from "../shared/marketplaceStyles";
@@ -175,6 +176,8 @@ export function AccountUtilityScreen({
         />
       ) : page === "store" ? (
         <Store products={products} navigate={navigate} />
+      ) : page === "settings" ? (
+        <SettingsScreen navigate={navigate} />
       ) : (
         <EmptyState
           icon={page === "coupons" ? "✦" : page === "wallet" ? "◉" : "⚙"}
@@ -249,6 +252,133 @@ function Store({ products, navigate }) {
         onWishlist={() => {}}
         onPress={(p) => navigate("detail", p)}
       />
+    </ScrollView>
+  );
+}
+
+function SettingsScreen({ navigate }) {
+  const [pushNotifications, setPushNotifications] = useState(true);
+  const [darkMode, setDarkMode] = useState(false);
+  const [biometricLogin, setBiometricLogin] = useState(true);
+
+  return (
+    <ScrollView contentContainerStyle={styles.settingsScroll}>
+      {/* ACCOUNT SECTION */}
+      <View style={styles.settingsGroup}>
+        <Text style={styles.settingsGroupTitle}>ACCOUNT</Text>
+        <View style={styles.settingsCard}>
+          <Pressable style={styles.settingsRow} onPress={() => {}}>
+            <View style={styles.settingsIconCircle}>
+              <Text style={styles.settingsIconText}>👤</Text>
+            </View>
+            <Text style={styles.settingsRowText}>Personal Information</Text>
+            <Text style={styles.settingsChevron}>›</Text>
+          </Pressable>
+
+          <View style={styles.settingsDivider} />
+
+          <Pressable style={styles.settingsRow} onPress={() => {}}>
+            <View style={styles.settingsIconCircle}>
+              <Text style={styles.settingsIconText}>🔒</Text>
+            </View>
+            <Text style={styles.settingsRowText}>Security & Privacy</Text>
+            <Text style={styles.settingsChevron}>›</Text>
+          </Pressable>
+
+          <View style={styles.settingsDivider} />
+
+          <Pressable style={styles.settingsRow} onPress={() => {}}>
+            <View style={styles.settingsIconCircle}>
+              <Text style={styles.settingsIconText}>📱</Text>
+            </View>
+            <Text style={styles.settingsRowText}>Linked Devices</Text>
+            <Text style={styles.settingsChevron}>›</Text>
+          </Pressable>
+        </View>
+      </View>
+
+      {/* PREFERENCES SECTION */}
+      <View style={styles.settingsGroup}>
+        <Text style={styles.settingsGroupTitle}>PREFERENCES</Text>
+        <View style={styles.settingsCard}>
+          <View style={styles.settingsRow}>
+            <View style={styles.settingsIconCircle}>
+              <Text style={styles.settingsIconText}>🔔</Text>
+            </View>
+            <Text style={styles.settingsRowText}>Push Notifications</Text>
+            <Switch
+              value={pushNotifications}
+              onValueChange={setPushNotifications}
+              trackColor={{ false: "#E5E7EB", true: "#10B981" }}
+              thumbColor="#FFFFFF"
+            />
+          </View>
+
+          <View style={styles.settingsDivider} />
+
+          <View style={styles.settingsRow}>
+            <View style={styles.settingsIconCircle}>
+              <Text style={styles.settingsIconText}>👁</Text>
+            </View>
+            <Text style={styles.settingsRowText}>Dark Mode</Text>
+            <Switch
+              value={darkMode}
+              onValueChange={setDarkMode}
+              trackColor={{ false: "#E5E7EB", true: "#10B981" }}
+              thumbColor="#FFFFFF"
+            />
+          </View>
+
+          <View style={styles.settingsDivider} />
+
+          <View style={styles.settingsRow}>
+            <View style={styles.settingsIconCircle}>
+              <Text style={styles.settingsIconText}>🛡</Text>
+            </View>
+            <Text style={styles.settingsRowText}>Biometric Login</Text>
+            <Switch
+              value={biometricLogin}
+              onValueChange={setBiometricLogin}
+              trackColor={{ false: "#E5E7EB", true: "#10B981" }}
+              thumbColor="#FFFFFF"
+            />
+          </View>
+        </View>
+      </View>
+
+      {/* SUPPORT SECTION */}
+      <View style={styles.settingsGroup}>
+        <Text style={styles.settingsGroupTitle}>SUPPORT</Text>
+        <View style={styles.settingsCard}>
+          <Pressable style={styles.settingsRow} onPress={() => {}}>
+            <View style={styles.settingsIconCircle}>
+              <Text style={styles.settingsIconText}>❓</Text>
+            </View>
+            <Text style={styles.settingsRowText}>Help Center</Text>
+            <Text style={styles.settingsChevron}>›</Text>
+          </Pressable>
+
+          <View style={styles.settingsDivider} />
+
+          <Pressable style={styles.settingsRow} onPress={() => {}}>
+            <View style={styles.settingsIconCircle}>
+              <Text style={styles.settingsIconText}>📄</Text>
+            </View>
+            <Text style={styles.settingsRowText}>Terms & Privacy</Text>
+            <Text style={styles.settingsChevron}>›</Text>
+          </Pressable>
+
+          <View style={styles.settingsDivider} />
+
+          <Pressable style={styles.settingsRow} onPress={() => {}}>
+            <View style={styles.settingsIconCircle}>
+              <Text style={styles.settingsIconText}>⚠️</Text>
+            </View>
+            <Text style={styles.settingsRowText}>Report a Problem</Text>
+            <Text style={styles.settingsChevron}>›</Text>
+          </Pressable>
+        </View>
+      </View>
     </ScrollView>
   );
 }
