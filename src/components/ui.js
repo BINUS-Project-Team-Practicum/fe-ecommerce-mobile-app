@@ -1,4 +1,5 @@
 import {
+  Animated,
   Image,
   Platform,
   Pressable,
@@ -7,6 +8,7 @@ import {
   TextInput,
   View,
 } from 'react-native';
+import { useEffect, useRef } from 'react';
 import { money } from '../data/mockData';
 import { Icon } from './Icon';
 
@@ -21,17 +23,27 @@ const sans = Platform.select({
   web: 'ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif',
 });
 
-export function Button({ label, onPress, variant = 'primary', small, disabled }) {
-  return <Pressable accessibilityRole="button" disabled={disabled} onPress={onPress} style={[styles.button, styles[variant], small && styles.buttonSmall, disabled && styles.disabled]}>
-    <Text style={[styles.buttonText, variant === 'outline' && styles.outlineText]}>{label}</Text>
-  </Pressable>;
+const AnimatedPressable = Animated.createAnimatedComponent(Pressable);
+
+function usePressScale() {
+  const scale = useRef(new Animated.Value(1)).current;
+  const animate = (value) => Animated.spring(scale, { toValue: value, useNativeDriver: true, speed: 30, bounciness: 3 }).start();
+  return { animationStyle: { transform: [{ scale }] }, handlers: { onPressIn: () => animate(0.97), onPressOut: () => animate(1) } };
 }
 
-export function IconButton({ icon, onPress, badge }) {
-  return <Pressable accessibilityRole="button" onPress={onPress} style={styles.iconButton}>
+export function Button({ label, onPress, variant = 'primary', small, disabled }) {
+  const pressAnimation = usePressScale();
+  return <AnimatedPressable accessibilityRole="button" disabled={disabled} onPress={onPress} style={[styles.button, styles[variant], small && styles.buttonSmall, disabled && styles.disabled, pressAnimation.animationStyle]} {...pressAnimation.handlers}>
+    <Text style={[styles.buttonText, variant === 'outline' && styles.outlineText]}>{label}</Text>
+  </AnimatedPressable>;
+}
+
+export function IconButton({ icon, onPress, badge, accessibilityLabel }) {
+  const pressAnimation = usePressScale();
+  return <AnimatedPressable accessibilityRole="button" accessibilityLabel={accessibilityLabel} onPress={onPress} style={[styles.iconButton, pressAnimation.animationStyle]} {...pressAnimation.handlers}>
     <Icon name={icon} size={21} color={colors.text} />
     {badge ? <View style={styles.badge}><Text style={styles.badgeText}>{badge}</Text></View> : null}
-  </Pressable>;
+  </AnimatedPressable>;
 }
 
 export function SearchBar({ onPress, value = '' }) {
@@ -62,14 +74,27 @@ export function ProductCard({ product, onPress, wishlisted, onWishlist, style, i
     <View>
       <Image source={{ uri: product.image }} style={[styles.productImage, imageStyle]} />
       <View style={styles.discount}><Text style={styles.discountText}>-{product.discount}%</Text></View>
-      <Pressable accessibilityLabel="Simpan ke favorit" onPress={(event) => { event.stopPropagation(); onWishlist?.(); }} style={styles.heart}>
-        <Icon name={wishlisted ? 'heart' : 'heart-outline'} size={17} color={wishlisted ? colors.danger : colors.text} />
-      </Pressable>
+      <FavoriteButton active={wishlisted} onPress={onWishlist} />
     </View>
     <Text numberOfLines={2} style={styles.productName}>{product.name}</Text>
     <Text style={styles.price}>{money(product.price)}</Text>
     <View style={styles.productMeta}><Rating value={product.rating} /><Text style={styles.muted}> {product.sold}</Text></View>
     <Text style={styles.store}>{product.location}</Text>
+  </Pressable>;
+}
+
+function FavoriteButton({ active, onPress }) {
+  const scale = useRef(new Animated.Value(1)).current;
+  const handlePress = (event) => {
+    event.stopPropagation();
+    Animated.sequence([
+      Animated.spring(scale, { toValue: 1.28, useNativeDriver: true, speed: 30, bounciness: 8 }),
+      Animated.spring(scale, { toValue: 1, useNativeDriver: true, speed: 24, bounciness: 5 }),
+    ]).start();
+    onPress?.();
+  };
+  return <Pressable accessibilityLabel="Simpan ke favorit" onPress={handlePress} style={styles.heart}>
+    <Animated.View style={{ transform: [{ scale }] }}><Icon name={active ? 'heart' : 'heart-outline'} size={17} color={active ? colors.danger : colors.text} /></Animated.View>
   </Pressable>;
 }
 
@@ -105,7 +130,18 @@ export function Tabs({ tabs, active, onChange }) {
 
 export function Skeleton({ width = '100%', height = 16, style }) { return <View accessibilityLabel="Memuat" style={[styles.skeleton, { width, height }, style]} />; }
 
-export function Toast({ message, visible }) { return visible ? <View accessibilityLiveRegion="polite" style={styles.toast}><Icon name="checkmark-circle" size={18} color="#6EE7B7" /><Text style={styles.toastText}>{message}</Text></View> : null; }
+export function Toast({ message, visible }) {
+  const translateY = useRef(new Animated.Value(24)).current;
+  const opacity = useRef(new Animated.Value(0)).current;
+  useEffect(() => {
+    if (!visible) return;
+    translateY.setValue(24);
+    opacity.setValue(0);
+    Animated.parallel([Animated.timing(opacity, { toValue: 1, duration: 180, useNativeDriver: true }), Animated.spring(translateY, { toValue: 0, useNativeDriver: true, speed: 20, bounciness: 4 })]).start();
+  }, [opacity, translateY, visible]);
+  if (!visible) return null;
+  return <Animated.View accessibilityLiveRegion="polite" style={[styles.toast, { opacity, transform: [{ translateY }] }]}><Icon name="checkmark-circle" size={18} color="#6EE7B7" /><Text style={styles.toastText}>{message}</Text></Animated.View>;
+}
 
 export function BottomSheet({ title, children, visible, onClose }) {
   if (!visible) return null;

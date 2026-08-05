@@ -1,5 +1,5 @@
-import { useState } from "react";
-import { View } from "react-native";
+import { useEffect, useRef, useState } from "react";
+import { Animated, View } from "react-native";
 import { colors } from "../../components/ui";
 import { SplashScreen, OnboardingScreen, AuthScreen } from "../auth/MarketplaceAuthViews";
 import { BottomNav, CategoriesScreen, HomeScreen, SearchScreen } from "../home/MarketplaceHomeViews";
@@ -12,6 +12,16 @@ export function AppShell(props) {
   const [page, setPage] = useState("home");
   const [selected, setSelected] = useState(null);
   const [query, setQuery] = useState("");
+  const opacity = useRef(new Animated.Value(1)).current;
+  const translateY = useRef(new Animated.Value(0)).current;
+  useEffect(() => {
+    opacity.setValue(0);
+    translateY.setValue(10);
+    Animated.parallel([
+      Animated.timing(opacity, { toValue: 1, duration: 180, useNativeDriver: true }),
+      Animated.timing(translateY, { toValue: 0, duration: 180, useNativeDriver: true }),
+    ]).start();
+  }, [opacity, page, translateY]);
   const navigate = (to, product) => {
     if (product) setSelected(product);
     setPage(to);
@@ -21,7 +31,9 @@ export function AppShell(props) {
   const showBottomNav = ["home", "explore", "wishlist", "profile"].includes(page);
   return (
     <View style={{ flex: 1, backgroundColor: colors.background }}>
-      {content}
+      <Animated.View style={{ flex: 1, opacity, transform: [{ translateY }] }}>
+        {content}
+      </Animated.View>
       {showBottomNav ? <BottomNav page={page} setPage={setPage} /> : null}
     </View>
   );

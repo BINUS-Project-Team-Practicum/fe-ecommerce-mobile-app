@@ -1,18 +1,28 @@
-import { useState } from "react";
-import { Alert, Image, Pressable, ScrollView, Text, View } from "react-native";
+import { useEffect, useState } from "react";
+import { Image, Pressable, ScrollView, Text, View } from "react-native";
 import { money } from "../../data/mockData";
-import { Button, EmptyState, QuantitySelector, Rating } from "../../components/ui";
+import { Button, EmptyState, IconButton, QuantitySelector, Rating, Toast } from "../../components/ui";
 import { Icon } from "../../components/Icon";
 import { Header, InfoRow } from "../shared/MarketplaceComponents";
 import { styles } from "../shared/marketplaceStyles";
 
 export function ProductDetailScreen({
   selected: p,
+  cart,
   wishlist,
   onToggleWishlist,
   onAddToCart,
   navigate,
 }) {
+  const [variant, setVariant] = useState("Midnight Black");
+  const [quantity, setQuantity] = useState(1);
+  const [activeTab, setActiveTab] = useState("description");
+  const [showCartFeedback, setShowCartFeedback] = useState(false);
+  useEffect(() => {
+    if (!showCartFeedback) return undefined;
+    const timeout = setTimeout(() => setShowCartFeedback(false), 2200);
+    return () => clearTimeout(timeout);
+  }, [showCartFeedback]);
   if (!p)
     return (
       <EmptyState
@@ -22,9 +32,6 @@ export function ProductDetailScreen({
         onAction={() => navigate("home")}
       />
     );
-  const [variant, setVariant] = useState("Midnight Black");
-  const [quantity, setQuantity] = useState(1);
-  const [activeTab, setActiveTab] = useState("description");
   const addSelectedProduct = () => {
     Array.from({ length: quantity }).forEach(() => onAddToCart(p));
   };
@@ -152,12 +159,18 @@ export function ProductDetailScreen({
         </View>
       </ScrollView>
       <View style={styles.stickyCta}>
+        <IconButton
+          icon="bag-handle-outline"
+          badge={cart?.length || null}
+          accessibilityLabel="Buka keranjang"
+          onPress={() => navigate("cart")}
+        />
         <Button
-          label="+ Keranjang"
+          label="Tambah"
           variant="outline"
           onPress={() => {
             addSelectedProduct();
-            Alert.alert("Ditambahkan", "Produk masuk ke keranjang Anda.");
+            setShowCartFeedback(true);
           }}
         />
         <Button
@@ -168,6 +181,7 @@ export function ProductDetailScreen({
           }}
         />
       </View>
+      <Toast visible={showCartFeedback} message="Produk ditambahkan ke keranjang" />
     </View>
   );
 }

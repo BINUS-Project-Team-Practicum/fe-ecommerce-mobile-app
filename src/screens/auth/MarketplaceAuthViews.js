@@ -80,6 +80,7 @@ export function AuthScreen({ onBack, onSuccess }) {
   const [lastName, setLastName] = useState("");
   const [phone, setPhone] = useState("");
   const [agreed, setAgreed] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
   const submit = () => {
     if (
       !email ||
@@ -100,26 +101,27 @@ export function AuthScreen({ onBack, onSuccess }) {
   return (
     <ScrollView
       style={styles.authPage}
-      contentContainerStyle={styles.referenceAuth}
+      contentContainerStyle={[styles.referenceAuth, !register && styles.loginAuth]}
       keyboardShouldPersistTaps="handled"
+      scrollEnabled={register}
     >
-      <View style={[styles.authHero, register && styles.registerHero]}>
-        <Pressable onPress={onBack} hitSlop={12}>
+      <View style={[styles.authHero, !register && styles.loginAuthHero, register && styles.registerHero]}>
+        {register && <Pressable onPress={onBack} hitSlop={12}>
           <Icon name="chevron-back" size={30} color="#fff" />
-        </Pressable>
+        </Pressable>}
         <View style={styles.authStoreIcon}>
-          <Icon name="bag-handle-outline" size={39} color="#fff" />
+          <Icon name="storefront-outline" size={36} color="#fff" />
         </View>
-        <Text style={styles.authHeroTitle}>
+        <Text style={[styles.authHeroTitle, !register && styles.loginAuthHeroTitle]}>
           {register ? "Create account" : "Welcome back"}
         </Text>
-        <Text style={styles.authHeroCopy}>
+        <Text style={[styles.authHeroCopy, !register && styles.loginAuthHeroCopy]}>
           {register
             ? "Join millions of happy shoppers"
             : "Sign in to continue shopping"}
         </Text>
       </View>
-      <View style={styles.authPanel}>
+      <View style={[styles.authPanel, !register && styles.loginAuthPanel]}>
         {register ? (
           <>
             <View style={styles.nameRow}>
@@ -160,6 +162,7 @@ export function AuthScreen({ onBack, onSuccess }) {
             onChangeText={setEmail}
             placeholder="alex.johnson@email.com"
             icon="mail-outline"
+            dense
           />
         )}
         <ReferenceInput
@@ -168,7 +171,10 @@ export function AuthScreen({ onBack, onSuccess }) {
           onChangeText={setPassword}
           placeholder={register ? "Enter password" : "••••••••"}
           icon="lock-closed-outline"
-          secureTextEntry
+          secureTextEntry={!showPassword}
+          rightIcon={showPassword ? "eye-off-outline" : "eye-outline"}
+          onRightIconPress={() => setShowPassword(!showPassword)}
+          dense={!register}
         />
         {!register && (
           <Pressable>
@@ -226,17 +232,18 @@ export function AuthScreen({ onBack, onSuccess }) {
     </ScrollView>
   );
 }
-function ReferenceInput({ label, compact, icon, ...props }) {
+function ReferenceInput({ label, compact, dense, icon, rightIcon, onRightIconPress, ...props }) {
   return (
-    <View style={[styles.referenceInputWrap, compact && { flex: 1 }]}>
-      <Text style={styles.referenceLabel}>{label}</Text>
-      <View style={styles.referenceInput}>
+    <View style={[styles.referenceInputWrap, dense && styles.loginInputWrap, compact && { flex: 1 }]}>
+      <Text style={[styles.referenceLabel, dense && styles.loginInputLabel]}>{label}</Text>
+      <View style={[styles.referenceInput, dense && styles.loginReferenceInput]}>
         {icon ? <Icon name={icon} size={19} color="#98A2B3" /> : null}
         <TextInput
           placeholderTextColor="#98A2B3"
-          style={styles.referenceInputText}
+          style={[styles.referenceInputText, dense && styles.loginReferenceInputText]}
           {...props}
         />
+        {rightIcon ? <Pressable onPress={onRightIconPress} hitSlop={10}><Icon name={rightIcon} size={21} color="#98A2B3" /></Pressable> : null}
       </View>
     </View>
   );

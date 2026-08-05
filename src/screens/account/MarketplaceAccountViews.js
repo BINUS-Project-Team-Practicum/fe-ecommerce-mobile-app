@@ -13,8 +13,10 @@ export function AccountUtilityScreen({
   page,
   user,
   products,
+  orders,
   wishlist,
   onToggleWishlist,
+  onCompleteOrder,
   navigate,
   onLogin,
 }) {
@@ -85,7 +87,7 @@ export function AccountUtilityScreen({
   if (page === "notifications")
     return (
       <View style={styles.page}>
-        <Header title="Notifikasi" />
+        <Header title="Notifikasi" onBack={() => navigate("home")} />
         {[
           "Voucher spesial untukmu",
           "Pesanan telah dikirim",
@@ -113,7 +115,7 @@ export function AccountUtilityScreen({
       <ScrollView contentContainerStyle={styles.scroll}>
         <Header title="Lacak Pesanan" onBack={() => navigate("home")} />
         <View style={styles.trackingCard}>
-          <Text style={styles.label}>Pesanan #MRA-240821</Text>
+          <Text style={styles.label}>Pesanan {orders?.[0]?.id || "#MRA-240821"}</Text>
           <Text style={styles.trackingStatus}>Dalam perjalanan</Text>
           <Text style={styles.description}>
             Paket sedang diantar menuju alamat Anda.
@@ -148,9 +150,10 @@ export function AccountUtilityScreen({
         ].map((x, i) => (
           <Pressable
             key={x}
-            onPress={() =>
-              i === 0 ? navigate("success") : Alert.alert("Metode dipilih", x)
-            }
+            onPress={() => {
+              onCompleteOrder?.();
+              navigate("success");
+            }}
             style={styles.payment}
           >
             <Icon name={["wallet-outline", "business-outline", "card-outline", "cash-outline"][i]} size={22} color="#10B981" />
@@ -165,7 +168,7 @@ export function AccountUtilityScreen({
     <View style={styles.page}>
       <Header title={title} onBack={() => navigate("profile")} />
       {page === "orders" ? (
-        <EmptyState
+        orders?.length ? <OrderHistory orders={orders} navigate={navigate} /> : <EmptyState
           icon="receipt-outline"
           title="Belum ada pesanan"
           body="Pesananmu akan muncul di sini."
@@ -202,6 +205,16 @@ export function AccountUtilityScreen({
       )}
     </View>
   );
+}
+
+function OrderHistory({ orders, navigate }) {
+  return <ScrollView contentContainerStyle={styles.scroll}>
+    {orders.map((order) => <Pressable key={order.id} onPress={() => navigate("tracking")} style={styles.checkoutCard}>
+      <View style={styles.summary}><Text style={styles.label}>{order.id}</Text><Text style={styles.action}>{order.status}</Text></View>
+      <Text style={styles.description}>{order.items.length} produk · Total {order.total.toLocaleString("id-ID")}</Text>
+      <Text style={styles.action}>Lacak pesanan</Text>
+    </Pressable>)}
+  </ScrollView>;
 }
 function Store({ products, navigate }) {
   return (

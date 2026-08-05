@@ -143,7 +143,7 @@ export function HomeScreen({
       </ScrollView>
       <View style={styles.referenceSectionLine}>
         <Text style={styles.referenceHeading}>Categories</Text>
-        <Text style={styles.seeAll}>Semua</Text>
+        <Pressable onPress={() => navigate("categories")}><Text style={styles.seeAll}>Semua</Text></Pressable>
       </View>
       <View style={styles.categoryGrid}>
         {categories.slice(1, 5).map(([icon, label]) => (
