@@ -1,7 +1,8 @@
 import { useState } from "react";
 import { Alert, Pressable, ScrollView, Switch, Text, View } from "react-native";
-import { EmptyState, Button, SectionTitle, colors } from "../../components/ui";
-import { ProductGrid } from "../shared/MarketplaceComponents";
+import { EmptyState, Button, SectionTitle } from "../../components/ui";
+import { Icon } from "../../components/Icon";
+import { Header, MenuGroup, ProductGrid } from "../shared/MarketplaceComponents";
 import { styles } from "../shared/marketplaceStyles";
 
 const pageTitles = {
@@ -33,7 +34,7 @@ export function AccountUtilityScreen({
           </ScrollView>
         ) : (
           <EmptyState
-            icon="♡"
+            icon="heart-outline"
             title="Belum ada favorit"
             body="Simpan produk yang kamu suka agar mudah ditemukan kembali."
             action="Jelajahi produk"
@@ -65,15 +66,18 @@ export function AccountUtilityScreen({
         <MenuGroup
           title="Aktivitas saya"
           entries={[
-            "orders|▣|Pesanan Saya",
-            "coupons|✦|Kupon Saya",
-            "wallet|◉|Mora Wallet",
+            { id: "orders", icon: "receipt-outline", label: "Pesanan Saya" },
+            { id: "coupons", icon: "ticket-outline", label: "Kupon Saya" },
+            { id: "wallet", icon: "wallet-outline", label: "Mora Wallet" },
           ]}
           navigate={navigate}
         />
         <MenuGroup
           title="Akun & bantuan"
-          entries={["chat|♧|Pesan", "settings|⚙|Pengaturan"]}
+          entries={[
+            { id: "chat", icon: "chatbubble-outline", label: "Pesan" },
+            { id: "settings", icon: "settings-outline", label: "Pengaturan" },
+          ]}
           navigate={navigate}
         />
       </ScrollView>
@@ -89,7 +93,7 @@ export function AccountUtilityScreen({
         ].map((x, i) => (
           <View key={x} style={styles.notification}>
             <View style={styles.notificationIcon}>
-              <Text>{i === 1 ? "▣" : "✦"}</Text>
+              <Icon name={i === 1 ? "cube-outline" : "ticket-outline"} size={19} color="#10B981" />
             </View>
             <View style={{ flex: 1 }}>
               <Text style={styles.notificationTitle}>{x}</Text>
@@ -149,9 +153,9 @@ export function AccountUtilityScreen({
             }
             style={styles.payment}
           >
-            <Text style={styles.paymentIcon}>{["◉", "B", "▣", "¤"][i]}</Text>
+            <Icon name={["wallet-outline", "business-outline", "card-outline", "cash-outline"][i]} size={22} color="#10B981" />
             <Text style={styles.infoTitle}>{x}</Text>
-            <Text style={styles.chevron}>›</Text>
+            <Icon name="chevron-forward" size={18} color="#6B7280" />
           </Pressable>
         ))}
       </ScrollView>
@@ -162,7 +166,7 @@ export function AccountUtilityScreen({
       <Header title={title} onBack={() => navigate("profile")} />
       {page === "orders" ? (
         <EmptyState
-          icon="▣"
+          icon="receipt-outline"
           title="Belum ada pesanan"
           body="Pesananmu akan muncul di sini."
           action="Belanja sekarang"
@@ -170,7 +174,7 @@ export function AccountUtilityScreen({
         />
       ) : page === "chat" ? (
         <EmptyState
-          icon="♧"
+          icon="chatbubble-outline"
           title="Belum ada percakapan"
           body="Mulai chat dengan penjual dari halaman produk."
         />
@@ -180,7 +184,7 @@ export function AccountUtilityScreen({
         <SettingsScreen navigate={navigate} />
       ) : (
         <EmptyState
-          icon={page === "coupons" ? "✦" : page === "wallet" ? "◉" : "⚙"}
+          icon={page === "coupons" ? "ticket-outline" : page === "wallet" ? "wallet-outline" : "settings-outline"}
           title={
             page === "coupons"
               ? "Belum ada kupon"
@@ -199,36 +203,6 @@ export function AccountUtilityScreen({
     </View>
   );
 }
-function Header({ title, onBack }) {
-  return (
-    <View style={styles.header}>
-      <Pressable onPress={onBack}>
-        <Text style={styles.back}>‹</Text>
-      </Pressable>
-      <Text style={styles.headerTitle}>{title}</Text>
-      <View style={{ width: 28 }} />
-    </View>
-  );
-}
-function MenuGroup({ title, entries, navigate }) {
-  return (
-    <View style={styles.menuGroup}>
-      <Text style={styles.menuTitle}>{title}</Text>
-      {entries.map((entry) => {
-        const [id, icon, label] = entry.split("|");
-        return (
-          <Pressable onPress={() => navigate(id)} key={id} style={styles.menu}>
-            <Text style={styles.menuIcon}>{icon}</Text>
-            <Text style={{ flex: 1, color: colors.text, fontWeight: "600" }}>
-              {label}
-            </Text>
-            <Text style={styles.chevron}>›</Text>
-          </Pressable>
-        );
-      })}
-    </View>
-  );
-}
 function Store({ products, navigate }) {
   return (
     <ScrollView contentContainerStyle={styles.scroll}>
@@ -237,7 +211,7 @@ function Store({ products, navigate }) {
           <Text>A</Text>
         </View>
         <Text style={styles.profileName}>Aster Official Store</Text>
-        <Text style={styles.storeInfo}>★ 4.9 · 12,3 rb pengikut · Online</Text>
+        <Text style={styles.storeInfo}>Rating 4.9 · 12,3 rb pengikut · Online</Text>
         <Button
           label="Ikuti"
           small
@@ -256,129 +230,45 @@ function Store({ products, navigate }) {
   );
 }
 
-function SettingsScreen({ navigate }) {
-  const [pushNotifications, setPushNotifications] = useState(true);
-  const [darkMode, setDarkMode] = useState(false);
-  const [biometricLogin, setBiometricLogin] = useState(true);
+const SETTINGS_GROUPS = [
+  { title: "ACCOUNT", rows: [["person-outline", "Personal Information"], ["lock-closed-outline", "Security & Privacy"], ["phone-portrait-outline", "Linked Devices"]] },
+  { title: "SUPPORT", rows: [["help-circle-outline", "Help Center"], ["document-text-outline", "Terms & Privacy"], ["flag-outline", "Report a Problem"]] },
+];
 
-  return (
-    <ScrollView contentContainerStyle={styles.settingsScroll}>
-      {/* ACCOUNT SECTION */}
-      <View style={styles.settingsGroup}>
-        <Text style={styles.settingsGroupTitle}>ACCOUNT</Text>
-        <View style={styles.settingsCard}>
-          <Pressable style={styles.settingsRow} onPress={() => {}}>
-            <View style={styles.settingsIconCircle}>
-              <Text style={styles.settingsIconText}>👤</Text>
-            </View>
-            <Text style={styles.settingsRowText}>Personal Information</Text>
-            <Text style={styles.settingsChevron}>›</Text>
-          </Pressable>
+function SettingsScreen() {
+  const [preferences, setPreferences] = useState({ push: true, dark: false, biometric: true });
+  const preferenceRows = [
+    ["push", "notifications-outline", "Push Notifications"],
+    ["dark", "moon-outline", "Dark Mode"],
+    ["biometric", "finger-print-outline", "Biometric Login"],
+  ];
+  const togglePreference = (key) => setPreferences((current) => ({ ...current, [key]: !current[key] }));
 
-          <View style={styles.settingsDivider} />
+  return <ScrollView contentContainerStyle={styles.settingsScroll}>
+    <SettingsGroup title="PREFERENCES" rows={preferenceRows} values={preferences} onToggle={togglePreference} />
+    {SETTINGS_GROUPS.map((group) => <SettingsGroup key={group.title} {...group} />)}
+  </ScrollView>;
+}
 
-          <Pressable style={styles.settingsRow} onPress={() => {}}>
-            <View style={styles.settingsIconCircle}>
-              <Text style={styles.settingsIconText}>🔒</Text>
-            </View>
-            <Text style={styles.settingsRowText}>Security & Privacy</Text>
-            <Text style={styles.settingsChevron}>›</Text>
-          </Pressable>
+function SettingsGroup({ title, rows, values, onToggle }) {
+  return <View style={styles.settingsGroup}>
+    <Text style={styles.settingsGroupTitle}>{title}</Text>
+    <View style={styles.settingsCard}>
+      {rows.map((row, index) => {
+        const [keyOrIcon, iconOrLabel, optionalLabel] = row;
+        const isToggle = Boolean(optionalLabel);
+        const icon = isToggle ? iconOrLabel : keyOrIcon;
+        const label = isToggle ? optionalLabel : iconOrLabel;
+        return <View key={label}>
+          {index ? <View style={styles.settingsDivider} /> : null}
+          <SettingsRow icon={icon} label={label} value={isToggle ? values[keyOrIcon] : undefined} onToggle={isToggle ? () => onToggle(keyOrIcon) : undefined} />
+        </View>;
+      })}
+    </View>
+  </View>;
+}
 
-          <View style={styles.settingsDivider} />
-
-          <Pressable style={styles.settingsRow} onPress={() => {}}>
-            <View style={styles.settingsIconCircle}>
-              <Text style={styles.settingsIconText}>📱</Text>
-            </View>
-            <Text style={styles.settingsRowText}>Linked Devices</Text>
-            <Text style={styles.settingsChevron}>›</Text>
-          </Pressable>
-        </View>
-      </View>
-
-      {/* PREFERENCES SECTION */}
-      <View style={styles.settingsGroup}>
-        <Text style={styles.settingsGroupTitle}>PREFERENCES</Text>
-        <View style={styles.settingsCard}>
-          <View style={styles.settingsRow}>
-            <View style={styles.settingsIconCircle}>
-              <Text style={styles.settingsIconText}>🔔</Text>
-            </View>
-            <Text style={styles.settingsRowText}>Push Notifications</Text>
-            <Switch
-              value={pushNotifications}
-              onValueChange={setPushNotifications}
-              trackColor={{ false: "#E5E7EB", true: "#10B981" }}
-              thumbColor="#FFFFFF"
-            />
-          </View>
-
-          <View style={styles.settingsDivider} />
-
-          <View style={styles.settingsRow}>
-            <View style={styles.settingsIconCircle}>
-              <Text style={styles.settingsIconText}>👁</Text>
-            </View>
-            <Text style={styles.settingsRowText}>Dark Mode</Text>
-            <Switch
-              value={darkMode}
-              onValueChange={setDarkMode}
-              trackColor={{ false: "#E5E7EB", true: "#10B981" }}
-              thumbColor="#FFFFFF"
-            />
-          </View>
-
-          <View style={styles.settingsDivider} />
-
-          <View style={styles.settingsRow}>
-            <View style={styles.settingsIconCircle}>
-              <Text style={styles.settingsIconText}>🛡</Text>
-            </View>
-            <Text style={styles.settingsRowText}>Biometric Login</Text>
-            <Switch
-              value={biometricLogin}
-              onValueChange={setBiometricLogin}
-              trackColor={{ false: "#E5E7EB", true: "#10B981" }}
-              thumbColor="#FFFFFF"
-            />
-          </View>
-        </View>
-      </View>
-
-      {/* SUPPORT SECTION */}
-      <View style={styles.settingsGroup}>
-        <Text style={styles.settingsGroupTitle}>SUPPORT</Text>
-        <View style={styles.settingsCard}>
-          <Pressable style={styles.settingsRow} onPress={() => {}}>
-            <View style={styles.settingsIconCircle}>
-              <Text style={styles.settingsIconText}>❓</Text>
-            </View>
-            <Text style={styles.settingsRowText}>Help Center</Text>
-            <Text style={styles.settingsChevron}>›</Text>
-          </Pressable>
-
-          <View style={styles.settingsDivider} />
-
-          <Pressable style={styles.settingsRow} onPress={() => {}}>
-            <View style={styles.settingsIconCircle}>
-              <Text style={styles.settingsIconText}>📄</Text>
-            </View>
-            <Text style={styles.settingsRowText}>Terms & Privacy</Text>
-            <Text style={styles.settingsChevron}>›</Text>
-          </Pressable>
-
-          <View style={styles.settingsDivider} />
-
-          <Pressable style={styles.settingsRow} onPress={() => {}}>
-            <View style={styles.settingsIconCircle}>
-              <Text style={styles.settingsIconText}>⚠️</Text>
-            </View>
-            <Text style={styles.settingsRowText}>Report a Problem</Text>
-            <Text style={styles.settingsChevron}>›</Text>
-          </Pressable>
-        </View>
-      </View>
-    </ScrollView>
-  );
+function SettingsRow({ icon, label, value, onToggle }) {
+  const content = <><View style={styles.settingsIconCircle}><Icon name={icon} size={18} color="#10B981" /></View><Text style={styles.settingsRowText}>{label}</Text>{onToggle ? <Switch value={value} onValueChange={onToggle} trackColor={{ false: "#E5E7EB", true: "#10B981" }} thumbColor="#FFFFFF" /> : <Icon name="chevron-forward" size={18} color="#6B7280" />}</>;
+  return onToggle ? <View style={styles.settingsRow}>{content}</View> : <Pressable accessibilityRole="button" style={styles.settingsRow}>{content}</Pressable>;
 }

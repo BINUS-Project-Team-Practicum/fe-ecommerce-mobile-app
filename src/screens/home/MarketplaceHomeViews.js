@@ -1,14 +1,12 @@
 import {
-  Image,
   ImageBackground,
   Pressable,
   ScrollView,
   Text,
   TextInput,
-  useWindowDimensions,
   View,
 } from "react-native";
-import { categories, money } from "../../data/mockData";
+import { categories } from "../../data/mockData";
 import {
   Button,
   Badge,
@@ -18,23 +16,22 @@ import {
   SectionTitle,
   colors,
 } from "../../components/ui";
-import { Header } from "../shared/MarketplaceComponents";
+import { Icon } from "../../components/Icon";
+import { ProductGrid, ReferenceProduct } from "../shared/MarketplaceComponents";
 import { sans, styles } from "../shared/marketplaceStyles";
 
 export function BottomNav({ page, setPage }) {
   const nav = [
-    ["home", "⌂", "Beranda"],
-    ["explore", "◈", "Explore"],
-    ["wishlist", "♡", "Favorit"],
-    ["profile", "◉", "Akun"],
+    ["home", "home-outline", "Beranda"],
+    ["explore", "compass-outline", "Explore"],
+    ["wishlist", "heart-outline", "Favorit"],
+    ["profile", "person-outline", "Akun"],
   ];
   return (
     <View style={styles.bottomNav}>
       {nav.map(([id, icon, label]) => (
         <Pressable key={id} onPress={() => setPage(id)} style={styles.navItem}>
-          <Text style={[styles.navIcon, page === id && styles.navActive]}>
-            {icon}
-          </Text>
+          <Icon name={page === id ? icon.replace("-outline", "") : icon} size={21} color={page === id ? colors.primary : "#94A3B8"} />
           <Text style={[styles.navLabel, page === id && styles.navActive]}>
             {label}
           </Text>
@@ -59,16 +56,16 @@ export function HomeScreen({
     >
       <View style={styles.homeHeader}>
         <View style={styles.delivery}>
-          <Text style={styles.pin}>⌖</Text>
+          <Icon name="location-outline" size={18} color={colors.primary} />
           <Text style={styles.deliveryText}>
             Dikirim ke{" "}
             <Text style={styles.deliveryStrong}>Jakarta Selatan</Text>⌄
           </Text>
         </View>
         <View style={styles.headerIcons}>
-          <IconButton icon="♧" onPress={() => navigate("notifications")} />
+          <IconButton icon="notifications-outline" onPress={() => navigate("notifications")} />
           <IconButton
-            icon="🛒"
+            icon="bag-handle-outline"
             badge={cart.length || null}
             onPress={() => navigate("cart")}
           />
@@ -78,7 +75,7 @@ export function HomeScreen({
         onPress={() => navigate("search")}
         style={styles.referenceSearch}
       >
-        <Text style={styles.referenceSearchIcon}>⌕</Text>
+        <Icon name="search-outline" size={20} color="#98A2B3" />
         <Text style={styles.referenceSearchText}>
           Cari produk, brand, atau toko
         </Text>
@@ -115,7 +112,7 @@ export function HomeScreen({
       </View>
       <View style={styles.referenceSectionLine}>
         <View style={styles.referenceSectionTitle}>
-          <Text style={styles.flashSymbol}>ϟ</Text>
+          <Icon name="flash-outline" size={20} color="#FF7A00" />
           <Text style={styles.referenceHeading}>Flash Sale</Text>
           <View style={styles.timer}>
             <Text>01:</Text>
@@ -127,7 +124,7 @@ export function HomeScreen({
             <Text>45</Text>
           </View>
         </View>
-          <Text style={styles.seeAll}>Lihat semua ›</Text>
+        <Text style={styles.seeAll}>Lihat semua</Text>
       </View>
       <ScrollView
         horizontal
@@ -146,7 +143,7 @@ export function HomeScreen({
       </ScrollView>
       <View style={styles.referenceSectionLine}>
         <Text style={styles.referenceHeading}>Categories</Text>
-        <Text style={styles.seeAll}>All ›</Text>
+        <Text style={styles.seeAll}>Semua</Text>
       </View>
       <View style={styles.categoryGrid}>
         {categories.slice(1, 5).map(([icon, label]) => (
@@ -156,7 +153,7 @@ export function HomeScreen({
             style={styles.referenceCategory}
           >
             <View style={styles.referenceCategoryIcon}>
-              <Text style={styles.referenceCategoryEmoji}>{icon}</Text>
+              <Icon name={icon} size={26} color={colors.primary} />
             </View>
             <Text numberOfLines={1} style={styles.referenceCategoryText}>
               {label}
@@ -166,10 +163,10 @@ export function HomeScreen({
       </View>
       <View style={styles.referenceSectionLine}>
         <View style={styles.referenceSectionTitle}>
-          <Text style={{ color: "#3B82F6" }}>↗</Text>
+          <Icon name="trending-up-outline" size={18} color="#3B82F6" />
           <Text style={styles.referenceHeading}>Best Sellers</Text>
         </View>
-        <Text style={styles.seeAll}>Lihat semua ›</Text>
+        <Text style={styles.seeAll}>Lihat semua</Text>
       </View>
       <ScrollView
         horizontal
@@ -191,7 +188,7 @@ export function HomeScreen({
       </ScrollView>
       <View style={styles.referenceSectionLine}>
         <View style={styles.referenceSectionTitle}>
-          <Text style={{ color: "#F59E0B" }}>♧</Text>
+          <Icon name="shield-checkmark-outline" size={18} color="#F59E0B" />
           <Text style={styles.referenceHeading}>Official Stores</Text>
         </View>
       </View>
@@ -208,12 +205,10 @@ export function HomeScreen({
               style={styles.officialCard}
             >
               <View style={styles.officialIcon}>
-                <Text style={{ fontSize: 28 }}>
-                  {["👟", "🎧", "💻", "👜"][i]}
-                </Text>
+                <Icon name={["footsteps-outline", "headset-outline", "laptop-outline", "bag-handle-outline"][i]} size={27} color={colors.primary} />
               </View>
               <Text style={styles.officialName}>{store}</Text>
-              <Text style={styles.officialBadge}>✓ Official</Text>
+              <Text style={styles.officialBadge}>Official Store</Text>
             </Pressable>
           ),
         )}
@@ -239,7 +234,7 @@ export function HomeScreen({
         ))}
       </View>
       <View style={styles.trustStrip}>
-        <Text style={styles.trustIcon}>✓</Text>
+        <Icon name="checkmark" size={16} color="#fff" style={styles.trustIcon} />
         <View style={{ flex: 1 }}>
           <Text style={styles.trustTitle}>Belanja nyaman bersama mora.</Text>
           <Text style={styles.trustCopy}>Pembayaran aman · Produk terkurasi · Bantuan 24/7</Text>
@@ -253,79 +248,6 @@ export function HomeScreen({
         <Button label="Masuk" small onPress={onLogin} />
       </View>
     </ScrollView>
-  );
-}
-function ReferenceProduct({ product, onPress, wishlisted, onWish }) {
-  return (
-    <Pressable onPress={onPress} style={styles.referenceProduct}>
-      <View>
-        <Image
-          source={{ uri: product.image }}
-          style={styles.referenceProductImage}
-        />
-        <View style={styles.referenceDiscount}>
-          <Text style={styles.referenceDiscountText}>-{product.discount}%</Text>
-        </View>
-        <Pressable
-          onPress={(e) => {
-            e.stopPropagation();
-            onWish();
-          }}
-          style={styles.referenceHeart}
-        >
-          <Text style={{ color: "#94A3B8", fontSize: 16 }}>
-            {wishlisted ? "♥" : "♡"}
-          </Text>
-        </Pressable>
-      </View>
-      <Text numberOfLines={1} style={styles.referenceStore}>
-        {product.store}
-      </Text>
-      <Text numberOfLines={2} style={styles.referenceProductName}>
-        {product.name}
-      </Text>
-      <View style={styles.referenceRating}>
-        <Text>★★★★</Text>
-        <Text style={{ color: "#D0D5DD" }}>★</Text>
-        <Text style={styles.referenceRatingText}>{product.rating}</Text>
-      </View>
-      <View style={styles.referencePriceLine}>
-        <Text style={styles.referencePrice}>{money(product.price)}</Text>
-        <Text style={styles.referenceSold}>{product.sold} sold</Text>
-      </View>
-    </Pressable>
-  );
-}
-function MiniProduct({ product, onPress }) {
-  return (
-    <Pressable onPress={onPress} style={styles.miniProduct}>
-      <Image source={{ uri: product.image }} style={styles.miniImage} />
-      <Text numberOfLines={1} style={styles.miniName}>
-        {product.name}
-      </Text>
-      <Text style={styles.miniPrice}>{money(product.price)}</Text>
-    </Pressable>
-  );
-}
-function ProductGrid({ products, wishlist, onWishlist, onPress }) {
-  const { width } = useWindowDimensions();
-  const columnCount = width >= 768 ? 3 : 2;
-  const gap = 10;
-  const cardWidth = (width - 32 - gap * (columnCount - 1)) / columnCount;
-  return (
-    <View style={styles.grid}>
-      {products.map((p) => (
-        <ProductCard
-          key={p.id}
-          product={p}
-          onPress={() => onPress(p)}
-          wishlisted={wishlist.includes(p.id)}
-          onWishlist={() => onWishlist(p.id)}
-          style={{ width: cardWidth, flexGrow: 0, flexShrink: 0 }}
-          imageStyle={{ height: cardWidth * 1.05 }}
-        />
-      ))}
-    </View>
   );
 }
 
@@ -361,14 +283,14 @@ export function SearchScreen({
           onPress={() => navigate("home")}
           style={styles.searchRoundButton}
         >
-          <Text style={styles.searchBack}>‹</Text>
+          <Icon name="chevron-back" size={25} color="#344054" />
         </Pressable>
         <View style={styles.referenceSearchInput}>
-          <Text style={styles.searchMagnifier}>⌕</Text>
+          <Icon name="search-outline" size={20} color={colors.primary} />
           <TextInputProxy value={query} onChange={setQuery} />
         </View>
         <Pressable onPress={() => {}} style={styles.searchRoundButton}>
-          <Text style={styles.filter}>☷</Text>
+          <Icon name="options-outline" size={21} color={colors.text} />
         </Pressable>
       </View>
       <ScrollView
@@ -394,7 +316,7 @@ export function SearchScreen({
                   onPress={() => setQuery(item)}
                   style={styles.recentChip}
                 >
-                  <Text style={styles.recentIcon}>◷</Text>
+                  <Icon name="time-outline" size={16} color="#64748B" />
                   <Text style={styles.recentText}>{item}</Text>
                 </Pressable>
               ))}
@@ -407,7 +329,7 @@ export function SearchScreen({
                   onPress={() => setQuery(item)}
                   style={styles.trendingChip}
                 >
-                  <Text style={styles.trendingIcon}>↗</Text>
+                  <Icon name="trending-up-outline" size={16} color={colors.primary} />
                   <Text style={styles.trendingText}>{item}</Text>
                 </Pressable>
               ))}
@@ -430,7 +352,6 @@ export function SearchScreen({
   );
 }
 function TextInputProxy({ value, onChange }) {
-  const { TextInput } = require("react-native");
   return (
     <TextInput
       autoFocus
@@ -466,7 +387,7 @@ export function CategoriesScreen({ navigate }) {
               style={styles.fullCategory}
             >
               <View style={styles.fullCategoryIcon}>
-                <Text style={{ fontSize: 25 }}>{icon}</Text>
+              <Icon name={icon} size={25} color={colors.primary} />
               </View>
               <Text style={styles.fullCategoryText}>{label}</Text>
             </Pressable>
@@ -477,7 +398,7 @@ export function CategoriesScreen({ navigate }) {
         <Text style={styles.storeAvatar}>A</Text>
         <View style={{ flex: 1 }}>
           <Text style={styles.storeName}>Aster Official Store</Text>
-          <Text style={styles.storeInfo}>★ 4.9 · Online 5 menit lalu</Text>
+          <Text style={styles.storeInfo}>Rating 4.9 · Online 5 menit lalu</Text>
         </View>
         <Button
           label="Kunjungi"

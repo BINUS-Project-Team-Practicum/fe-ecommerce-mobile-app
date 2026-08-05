@@ -2,7 +2,8 @@ import { useState } from "react";
 import { Alert, Image, Pressable, ScrollView, Text, View } from "react-native";
 import { money } from "../../data/mockData";
 import { Button, EmptyState, QuantitySelector, Rating } from "../../components/ui";
-import { Header } from "../shared/MarketplaceComponents";
+import { Icon } from "../../components/Icon";
+import { Header, InfoRow } from "../shared/MarketplaceComponents";
 import { styles } from "../shared/marketplaceStyles";
 
 export function ProductDetailScreen({
@@ -37,19 +38,17 @@ export function ProductDetailScreen({
             onPress={() => navigate("home")}
             style={styles.floatingBack}
           >
-            <Text style={styles.back}>‹</Text>
+            <Icon name="chevron-back" size={28} color="#111827" />
           </Pressable>
           <View style={styles.detailTopActions}>
             <Pressable style={styles.floatingAction}>
-              <Text style={styles.detailActionIcon}>♧</Text>
+              <Icon name="share-social-outline" size={20} />
             </Pressable>
             <Pressable
               onPress={() => onToggleWishlist(p.id)}
               style={styles.floatingAction}
             >
-              <Text style={styles.detailActionIcon}>
-                {wishlist.includes(p.id) ? "♥" : "♡"}
-              </Text>
+              <Icon name={wishlist.includes(p.id) ? "heart" : "heart-outline"} size={20} color={wishlist.includes(p.id) ? "#EF4444" : "#111827"} />
             </Pressable>
           </View>
         </View>
@@ -83,7 +82,7 @@ export function ProductDetailScreen({
             <Text style={styles.detailDiscount}>-{p.discount}%</Text>
           </View>
           <View style={styles.detailMeta}>
-            <Text style={styles.detailStars}>★★★★<Text style={styles.detailStarMuted}>★</Text></Text>
+            <Icon name="star" size={14} color="#F59E0B" />
             <Text style={styles.detailRating}>{p.rating} ({p.sold})</Text>
             <Text style={styles.detailSold}>{p.sold} sold</Text>
           </View>
@@ -111,27 +110,27 @@ export function ProductDetailScreen({
             <Text style={styles.quantityLabel}>Quantity</Text>
             <View style={styles.detailQuantityControl}>
               <Pressable onPress={() => setQuantity(Math.max(1, quantity - 1))} style={styles.detailQuantityButton}>
-                <Text style={styles.detailQuantitySign}>−</Text>
+                <Icon name="remove" size={16} />
               </Pressable>
               <Text style={styles.detailQuantityValue}>{quantity}</Text>
               <Pressable onPress={() => setQuantity(quantity + 1)} style={[styles.detailQuantityButton, styles.detailQuantityAdd]}>
-                <Text style={styles.detailQuantityAddText}>+</Text>
+                <Icon name="add" size={16} color="#fff" />
               </Pressable>
             </View>
           </View>
           <View style={styles.benefitPanel}>
             <View style={styles.benefitPrimary}>
-              <Text style={styles.benefitIcon}>▱</Text>
+              <Icon name="car-outline" size={19} color="#10B981" />
               <Text style={styles.benefitTitle}>Free Shipping</Text>
               <Text style={styles.benefitCopy}>Est. delivery 2–4 days</Text>
             </View>
             <View style={styles.benefitSecondary}>
-              <Text>♢  Buyer Protection</Text>
-              <Text>↻  Free Returns</Text>
+              <Text>Buyer Protection</Text>
+              <Text>Free Returns</Text>
             </View>
           </View>
           <Pressable style={styles.couponRow}>
-            <Text style={styles.couponIcon}>♧</Text>
+            <Icon name="ticket-outline" size={20} color="#10B981" />
             <Text style={styles.couponText}>Hemat ekstra 25% dengan kupon</Text>
             <Text style={styles.couponClaim}>Claim</Text>
           </Pressable>
@@ -172,19 +171,6 @@ export function ProductDetailScreen({
     </View>
   );
 }
-function InfoRow({ icon, title, body }) {
-  return (
-    <View style={styles.infoRow}>
-      <Text style={styles.infoIcon}>{icon}</Text>
-      <View style={{ flex: 1 }}>
-        <Text style={styles.infoTitle}>{title}</Text>
-        <Text style={styles.infoBody}>{body}</Text>
-      </View>
-      <Text style={styles.chevron}>›</Text>
-    </View>
-  );
-}
-
 export function CartScreen({ cart, onUpdateQuantity, navigate }) {
   const total = cart.reduce((sum, x) => sum + x.price * x.quantity, 0);
   return (
@@ -192,7 +178,7 @@ export function CartScreen({ cart, onUpdateQuantity, navigate }) {
       <Header title="Keranjang" onBack={() => navigate("home")} />
       {!cart.length ? (
         <EmptyState
-          icon="🛒"
+          icon="bag-handle-outline"
           title="Keranjangmu masih kosong"
           body="Yuk, temukan produk yang kamu suka."
           action="Mulai belanja"
@@ -250,14 +236,14 @@ export function CheckoutScreen({ cart, navigate }) {
       <View style={styles.checkoutCard}>
         <Text style={styles.label}>Pengiriman</Text>
         <InfoRow
-          icon="▣"
+          icon="car-outline"
           title="Regular"
           body="Estimasi tiba 2–4 hari · Rp15.000"
         />
       </View>
       <View style={styles.checkoutCard}>
         <Text style={styles.label}>Voucher</Text>
-        <InfoRow icon="✦" title="Hemat Rp15.000" body="Gunakan voucher toko" />
+        <InfoRow icon="ticket-outline" title="Hemat Rp15.000" body="Gunakan voucher toko" />
       </View>
       <View style={styles.checkoutCard}>
         <Text style={styles.label}>Ringkasan pembayaran</Text>
@@ -287,7 +273,7 @@ export function OrderSuccessScreen({ navigate }) {
   return (
     <View style={styles.success}>
       <View style={styles.successIcon}>
-        <Text style={{ fontSize: 38 }}>✓</Text>
+        <Icon name="checkmark" size={38} color="#047857" />
       </View>
       <Text style={styles.successTitle}>Pesanan berhasil dibuat!</Text>
       <Text style={styles.successCopy}>

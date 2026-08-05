@@ -1,5 +1,8 @@
 export const categories = [
-  ['⚡', 'Flash Sale'], ['📱', 'Elektronik'], ['👟', 'Fashion'], ['🛒', 'Grocery'], ['💄', 'Kecantikan'], ['🏠', 'Rumah'], ['🎮', 'Hobi'], ['⋯', 'Lainnya'],
+  ['flash-outline', 'Flash Sale'], ['phone-portrait-outline', 'Elektronik'],
+  ['shirt-outline', 'Fashion'], ['basket-outline', 'Grocery'],
+  ['sparkles-outline', 'Kecantikan'], ['home-outline', 'Rumah'],
+  ['game-controller-outline', 'Hobi'], ['grid-outline', 'Lainnya'],
 ];
 
 export const demoProducts = [

@@ -1,13 +1,14 @@
 import { useState } from "react";
 import { Alert, Pressable, ScrollView, Text, TextInput, View } from "react-native";
-import { Button, colors } from "../../components/ui";
+import { Button } from "../../components/ui";
+import { Icon } from "../../components/Icon";
 import { styles } from "../shared/marketplaceStyles";
 
 export function SplashScreen() {
   return (
     <View style={styles.splash}>
       <View style={styles.splashLogo}>
-        <Text style={styles.splashShop}>♜</Text>
+        <Icon name="bag-handle-outline" size={54} color="#fff" />
       </View>
       <Text style={styles.splashBrand}>Verdant</Text>
       <Text style={styles.splashCopy}>Shop Smarter. Live Better.</Text>
@@ -23,17 +24,17 @@ export function OnboardingScreen({ onDone, onSkip }) {
   const [step, setStep] = useState(0);
   const slides = [
     [
-      "🛍️",
+      "bag-handle-outline",
       "Millions of Products",
       "Discover deals from thousands of trusted sellers all in one place.",
     ],
     [
-      "⚡",
+      "flash-outline",
       "Deals Made For You",
       "Find the best prices from stores you can trust.",
     ],
     [
-      "📦",
+      "cube-outline",
       "Delivered With Care",
       "Track every order from checkout to your door.",
     ],
@@ -43,7 +44,7 @@ export function OnboardingScreen({ onDone, onSkip }) {
     <View style={styles.referenceOnboarding}>
       <View style={styles.onboardingGreen}>
         <View style={styles.bagCircle}>
-          <Text style={styles.bagEmoji}>{slide[0]}</Text>
+          <Icon name={slide[0]} size={84} color="#fff" />
         </View>
         <Text style={styles.referenceOnboardTitle}>{slide[1]}</Text>
         <Text style={styles.referenceOnboardCopy}>{slide[2]}</Text>
@@ -104,10 +105,10 @@ export function AuthScreen({ onBack, onSuccess }) {
     >
       <View style={[styles.authHero, register && styles.registerHero]}>
         <Pressable onPress={onBack} hitSlop={12}>
-          <Text style={styles.authBack}>‹</Text>
+          <Icon name="chevron-back" size={30} color="#fff" />
         </Pressable>
         <View style={styles.authStoreIcon}>
-          <Text style={styles.authStoreGlyph}>♜</Text>
+          <Icon name="bag-handle-outline" size={39} color="#fff" />
         </View>
         <Text style={styles.authHeroTitle}>
           {register ? "Create account" : "Welcome back"}
@@ -158,7 +159,7 @@ export function AuthScreen({ onBack, onSuccess }) {
             value={email}
             onChangeText={setEmail}
             placeholder="alex.johnson@email.com"
-            icon="♙"
+            icon="mail-outline"
           />
         )}
         <ReferenceInput
@@ -166,7 +167,7 @@ export function AuthScreen({ onBack, onSuccess }) {
           value={password}
           onChangeText={setPassword}
           placeholder={register ? "Enter password" : "••••••••"}
-          icon="♙"
+          icon="lock-closed-outline"
           secureTextEntry
         />
         {!register && (
@@ -180,7 +181,7 @@ export function AuthScreen({ onBack, onSuccess }) {
             style={styles.agreement}
           >
             <View style={[styles.checkbox, agreed && styles.checkboxChecked]}>
-              <Text style={styles.checkText}>{agreed ? "✓" : ""}</Text>
+              {agreed ? <Icon name="checkmark" size={16} color="#fff" /> : null}
             </View>
             <Text style={styles.agreementText}>
               I agree to the{" "}
@@ -201,8 +202,8 @@ export function AuthScreen({ onBack, onSuccess }) {
               <View style={styles.dividerLine} />
             </View>
             <View style={styles.socialRow}>
-              <SocialButton label="🌐 Google" />
-              <SocialButton label="🍎 Apple" />
+              <SocialButton label="Google" icon="logo-google" />
+              <SocialButton label="Apple" icon="logo-apple" />
             </View>
           </>
         )}
@@ -230,7 +231,7 @@ function ReferenceInput({ label, compact, icon, ...props }) {
     <View style={[styles.referenceInputWrap, compact && { flex: 1 }]}>
       <Text style={styles.referenceLabel}>{label}</Text>
       <View style={styles.referenceInput}>
-        <Text style={styles.fieldIcon}>{icon || ""}</Text>
+        {icon ? <Icon name={icon} size={19} color="#98A2B3" /> : null}
         <TextInput
           placeholderTextColor="#98A2B3"
           style={styles.referenceInputText}
@@ -240,11 +241,11 @@ function ReferenceInput({ label, compact, icon, ...props }) {
     </View>
   );
 }
-function SocialButton({ label }) {
+function SocialButton({ label, icon }) {
   return (
     <Pressable style={styles.socialButton}>
+      <Icon name={icon} size={18} color="#344054" />
       <Text style={styles.socialText}>{label}</Text>
     </Pressable>
   );
 }
-
