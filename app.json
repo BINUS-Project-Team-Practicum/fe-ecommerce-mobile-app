@@ -18,13 +18,20 @@
     "android": {
       "adaptiveIcon": {
         "backgroundColor": "#f8fafc"
-      }
+      },
+      "package": "com.ardanimith.ecommercemarketplace"
     },
     "web": {
       "bundler": "metro"
     },
     "plugins": [
       "expo-asset"
-    ]
+    ],
+    "extra": {
+      "eas": {
+        "projectId": "d1262dd9-9728-4d8a-8371-8d2d66715b26"
+      }
+    },
+    "owner": "ardanimith"
   }
 }

@@ -1,5 +1,7 @@
 import { useEffect, useState } from 'react';
 import { SafeAreaView, StatusBar } from 'react-native';
+import { useFonts } from 'expo-font';
+import Ionicons from '@expo/vector-icons/Ionicons';
 import * as SecureStore from 'expo-secure-store';
 import { AppShell, AuthScreen, OnboardingScreen, SplashScreen } from './src/screens/AppScreens';
 import { demoProducts } from './src/data/mockData';
@@ -23,12 +25,19 @@ function serializeState({ user, cart, wishlist, orders }) {
 }
 
 export default function App() {
+  const [iconsLoaded, iconLoadError] = useFonts(Ionicons.font);
+  const [fontLoadTimedOut, setFontLoadTimedOut] = useState(false);
   const [stage, setStage] = useState('splash');
   const [user, setUser] = useState(null);
   const [cart, setCart] = useState([]);
   const [wishlist, setWishlist] = useState([]);
   const [orders, setOrders] = useState([]);
   const [isHydrated, setIsHydrated] = useState(false);
+
+  useEffect(() => {
+    const timer = setTimeout(() => setFontLoadTimedOut(true), 2500);
+    return () => clearTimeout(timer);
+  }, []);
 
   useEffect(() => {
     const timer = setTimeout(() => setStage((current) => current === 'splash' ? 'onboarding' : current), 900);
@@ -72,6 +81,8 @@ export default function App() {
     setOrders((items) => [{ id: `MRA-${Date.now().toString().slice(-6)}`, items: cart.map(({ id, quantity }) => ({ id, quantity })), total, status: 'Diproses' }, ...items]);
     setCart([]);
   };
+
+  if (!iconsLoaded && !iconLoadError && !fontLoadTimedOut) return <SplashScreen />;
 
   return <SafeAreaView style={{ flex: 1, backgroundColor: '#F8FAFC' }}><StatusBar barStyle="dark-content" />
     {stage === 'splash' && <SplashScreen />}
