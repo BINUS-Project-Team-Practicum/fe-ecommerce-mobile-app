@@ -1,17 +1,22 @@
-import { useEffect, useRef, useState } from "react";
-import { Animated, View } from "react-native";
-import { colors } from "../../components/ui";
-import { BottomNav, CategoriesScreen, HomeScreen, SearchScreen } from "../home/MarketplaceHomeViews";
-import CartScreen from "../shopping/CartScreen";
-import CheckoutScreen from "../shopping/CheckoutScreen";
-import OrderSuccessScreen from "../shopping/OrderSuccessScreen";
-import ProductDetailScreen from "../shopping/ProductDetailScreen";
-import { AccountUtilityScreen } from "../account/MarketplaceAccountViews";
+import { useEffect, useRef, useState } from 'react';
+import { Animated, View } from 'react-native';
+import { colors } from '../../components/ui';
+import {
+  BottomNav,
+  CategoriesScreen,
+  HomeScreen,
+  SearchScreen,
+} from '../home/MarketplaceHomeViews';
+import CartScreen from '../shopping/CartScreen';
+import CheckoutScreen from '../shopping/CheckoutScreen';
+import OrderSuccessScreen from '../shopping/OrderSuccessScreen';
+import ProductDetailScreen from '../shopping/ProductDetailScreen';
+import { AccountUtilityScreen } from '../account/MarketplaceAccountViews';
 
 export function AppShell(props) {
-  const [page, setPage] = useState("home");
+  const [page, setPage] = useState('home');
   const [selected, setSelected] = useState(null);
-  const [query, setQuery] = useState("");
+  const [query, setQuery] = useState('');
   const opacity = useRef(new Animated.Value(1)).current;
   const translateY = useRef(new Animated.Value(0)).current;
   useEffect(() => {
@@ -28,7 +33,7 @@ export function AppShell(props) {
   };
   const screenProps = { ...props, navigate, selected, query, setQuery };
   const content = renderPage(page, screenProps);
-  const showBottomNav = ["home", "explore", "wishlist", "profile"].includes(page);
+  const showBottomNav = ['home', 'explore', 'wishlist', 'profile'].includes(page);
   return (
     <View style={{ flex: 1, backgroundColor: colors.background }}>
       <Animated.View style={{ flex: 1, opacity, transform: [{ translateY }] }}>
@@ -51,5 +56,9 @@ function renderPage(page, screenProps) {
     categories: CategoriesScreen,
   };
   const Screen = screenByPage[page];
-  return Screen ? <Screen {...screenProps} /> : <AccountUtilityScreen page={page} {...screenProps} />;
+  return Screen ? (
+    <Screen {...screenProps} />
+  ) : (
+    <AccountUtilityScreen page={page} {...screenProps} />
+  );
 }

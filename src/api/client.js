@@ -2,7 +2,9 @@ const API_URL = process.env.EXPO_PUBLIC_API_URL;
 
 function getUrl(path) {
   if (!API_URL) {
-    throw new Error('EXPO_PUBLIC_API_URL belum diatur. Salin .env.example ke .env lalu isi URL backend.');
+    throw new Error(
+      'EXPO_PUBLIC_API_URL belum diatur. Salin .env.example ke .env lalu isi URL backend.',
+    );
   }
   return `${API_URL.replace(/\/$/, '')}/${path.replace(/^\//, '')}`;
 }

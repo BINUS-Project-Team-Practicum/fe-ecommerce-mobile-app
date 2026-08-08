@@ -1,8 +1,8 @@
-import { useState } from "react";
-import { Alert, Pressable, ScrollView, Text, TextInput, View } from "react-native";
-import { Button } from "../../components/ui";
-import { Icon } from "../../components/Icon";
-import { styles } from "./authStyles";
+import { useState } from 'react';
+import { Alert, Pressable, ScrollView, Text, TextInput, View } from 'react-native';
+import { Button } from '../../components/ui';
+import { Icon } from '../../components/Icon';
+import { styles } from './authStyles';
 
 export function SplashScreen() {
   return (
@@ -24,20 +24,12 @@ export function OnboardingScreen({ onDone, onSkip }) {
   const [step, setStep] = useState(0);
   const slides = [
     [
-      "bag-handle-outline",
-      "Millions of Products",
-      "Discover deals from thousands of trusted sellers all in one place.",
+      'bag-handle-outline',
+      'Millions of Products',
+      'Discover deals from thousands of trusted sellers all in one place.',
     ],
-    [
-      "flash-outline",
-      "Deals Made For You",
-      "Find the best prices from stores you can trust.",
-    ],
-    [
-      "cube-outline",
-      "Delivered With Care",
-      "Track every order from checkout to your door.",
-    ],
+    ['flash-outline', 'Deals Made For You', 'Find the best prices from stores you can trust.'],
+    ['cube-outline', 'Delivered With Care', 'Track every order from checkout to your door.'],
   ];
   const slide = slides[step];
   return (
@@ -52,17 +44,11 @@ export function OnboardingScreen({ onDone, onSkip }) {
       <View style={styles.onboardingWhite}>
         <View style={styles.referenceDots}>
           {slides.map((_, i) => (
-            <View
-              key={i}
-              style={[
-                styles.referenceDot,
-                i === step && styles.referenceDotActive,
-              ]}
-            />
+            <View key={i} style={[styles.referenceDot, i === step && styles.referenceDotActive]} />
           ))}
         </View>
         <Button
-          label={step === 2 ? "Get Started" : "Next"}
+          label={step === 2 ? 'Get Started' : 'Next'}
           onPress={() => (step === 2 ? onDone() : setStep(step + 1))}
         />
         <Pressable onPress={onSkip} hitSlop={12}>
@@ -74,27 +60,23 @@ export function OnboardingScreen({ onDone, onSkip }) {
 }
 export function AuthScreen({ onBack, onSuccess }) {
   const [register, setRegister] = useState(false);
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [firstName, setFirstName] = useState("");
-  const [lastName, setLastName] = useState("");
-  const [phone, setPhone] = useState("");
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [firstName, setFirstName] = useState('');
+  const [lastName, setLastName] = useState('');
+  const [phone, setPhone] = useState('');
   const [agreed, setAgreed] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const submit = () => {
-    if (
-      !email ||
-      !password ||
-      (register && (!firstName || !lastName || !phone || !agreed))
-    )
+    if (!email || !password || (register && (!firstName || !lastName || !phone || !agreed)))
       return Alert.alert(
-        "Lengkapi data",
+        'Lengkapi data',
         register
-          ? "Isi seluruh data dan setujui ketentuan."
-          : "Masukkan email dan password untuk melanjutkan.",
+          ? 'Isi seluruh data dan setujui ketentuan.'
+          : 'Masukkan email dan password untuk melanjutkan.',
       );
     onSuccess({
-      name: register ? `${firstName} ${lastName}` : email.split("@")[0],
+      name: register ? `${firstName} ${lastName}` : email.split('@')[0],
       email,
     });
   };
@@ -105,20 +87,26 @@ export function AuthScreen({ onBack, onSuccess }) {
       keyboardShouldPersistTaps="handled"
       scrollEnabled={register}
     >
-      <View style={[styles.authHero, !register && styles.loginAuthHero, register && styles.registerHero]}>
-        {register && <Pressable onPress={onBack} hitSlop={12}>
-          <Icon name="chevron-back" size={30} color="#fff" />
-        </Pressable>}
+      <View
+        style={[
+          styles.authHero,
+          !register && styles.loginAuthHero,
+          register && styles.registerHero,
+        ]}
+      >
+        {register && (
+          <Pressable onPress={onBack} hitSlop={12}>
+            <Icon name="chevron-back" size={30} color="#fff" />
+          </Pressable>
+        )}
         <View style={styles.authStoreIcon}>
           <Icon name="storefront-outline" size={36} color="#fff" />
         </View>
         <Text style={[styles.authHeroTitle, !register && styles.loginAuthHeroTitle]}>
-          {register ? "Create account" : "Welcome back"}
+          {register ? 'Create account' : 'Welcome back'}
         </Text>
         <Text style={[styles.authHeroCopy, !register && styles.loginAuthHeroCopy]}>
-          {register
-            ? "Join millions of happy shoppers"
-            : "Sign in to continue shopping"}
+          {register ? 'Join millions of happy shoppers' : 'Sign in to continue shopping'}
         </Text>
       </View>
       <View style={[styles.authPanel, !register && styles.loginAuthPanel]}>
@@ -169,10 +157,10 @@ export function AuthScreen({ onBack, onSuccess }) {
           label="PASSWORD"
           value={password}
           onChangeText={setPassword}
-          placeholder={register ? "Enter password" : "••••••••"}
+          placeholder={register ? 'Enter password' : '••••••••'}
           icon="lock-closed-outline"
           secureTextEntry={!showPassword}
-          rightIcon={showPassword ? "eye-off-outline" : "eye-outline"}
+          rightIcon={showPassword ? 'eye-off-outline' : 'eye-outline'}
           onRightIconPress={() => setShowPassword(!showPassword)}
           dense={!register}
         />
@@ -182,24 +170,17 @@ export function AuthScreen({ onBack, onSuccess }) {
           </Pressable>
         )}
         {register && (
-          <Pressable
-            onPress={() => setAgreed(!agreed)}
-            style={styles.agreement}
-          >
+          <Pressable onPress={() => setAgreed(!agreed)} style={styles.agreement}>
             <View style={[styles.checkbox, agreed && styles.checkboxChecked]}>
               {agreed ? <Icon name="checkmark" size={16} color="#fff" /> : null}
             </View>
             <Text style={styles.agreementText}>
-              I agree to the{" "}
-              <Text style={styles.agreementLink}>Terms of Service</Text> and{" "}
+              I agree to the <Text style={styles.agreementLink}>Terms of Service</Text> and{' '}
               <Text style={styles.agreementLink}>Privacy Policy</Text>
             </Text>
           </Pressable>
         )}
-        <Button
-          label={register ? "Create Account" : "Sign In"}
-          onPress={submit}
-        />
+        <Button label={register ? 'Create Account' : 'Sign In'} onPress={submit} />
         {!register && (
           <>
             <View style={styles.divider}>
@@ -217,13 +198,11 @@ export function AuthScreen({ onBack, onSuccess }) {
           <Text style={styles.switchAuth}>
             {register ? (
               <>
-                Already have an account?{" "}
-                <Text style={styles.greenLink}>Sign In</Text>
+                Already have an account? <Text style={styles.greenLink}>Sign In</Text>
               </>
             ) : (
               <>
-                Don't have an account?{" "}
-                <Text style={styles.greenLink}>Sign Up</Text>
+                Don&apos;t have an account? <Text style={styles.greenLink}>Sign Up</Text>
               </>
             )}
           </Text>
@@ -234,7 +213,9 @@ export function AuthScreen({ onBack, onSuccess }) {
 }
 function ReferenceInput({ label, compact, dense, icon, rightIcon, onRightIconPress, ...props }) {
   return (
-    <View style={[styles.referenceInputWrap, dense && styles.loginInputWrap, compact && { flex: 1 }]}>
+    <View
+      style={[styles.referenceInputWrap, dense && styles.loginInputWrap, compact && { flex: 1 }]}
+    >
       <Text style={[styles.referenceLabel, dense && styles.loginInputLabel]}>{label}</Text>
       <View style={[styles.referenceInput, dense && styles.loginReferenceInput]}>
         {icon ? <Icon name={icon} size={19} color="#98A2B3" /> : null}
@@ -243,7 +224,11 @@ function ReferenceInput({ label, compact, dense, icon, rightIcon, onRightIconPre
           style={[styles.referenceInputText, dense && styles.loginReferenceInputText]}
           {...props}
         />
-        {rightIcon ? <Pressable onPress={onRightIconPress} hitSlop={10}><Icon name={rightIcon} size={21} color="#98A2B3" /></Pressable> : null}
+        {rightIcon ? (
+          <Pressable onPress={onRightIconPress} hitSlop={10}>
+            <Icon name={rightIcon} size={21} color="#98A2B3" />
+          </Pressable>
+        ) : null}
       </View>
     </View>
   );

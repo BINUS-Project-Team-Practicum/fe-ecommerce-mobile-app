@@ -1,17 +1,14 @@
-import { Image, Pressable, Text, useWindowDimensions, View } from "react-native";
-import { money } from "../../data/mockData";
-import { ProductCard } from "../../components/ui";
-import { Icon } from "../../components/Icon";
-import { styles } from "./marketplaceComponentStyles";
+import { Image, Pressable, Text, useWindowDimensions, View } from 'react-native';
+import { money } from '../../data/mockData';
+import { ProductCard } from '../../components/ui';
+import { Icon } from '../../components/Icon';
+import { styles } from './marketplaceComponentStyles';
 
 export function ReferenceProduct({ product, onPress, wishlisted, onWish }) {
   return (
     <Pressable onPress={onPress} style={styles.referenceProduct}>
       <View>
-        <Image
-          source={{ uri: product.image }}
-          style={styles.referenceProductImage}
-        />
+        <Image source={{ uri: product.image }} style={styles.referenceProductImage} />
         <View style={styles.referenceDiscount}>
           <Text style={styles.referenceDiscountText}>-{product.discount}%</Text>
         </View>
@@ -22,7 +19,11 @@ export function ReferenceProduct({ product, onPress, wishlisted, onWish }) {
           }}
           style={styles.referenceHeart}
         >
-          <Icon name={wishlisted ? "heart" : "heart-outline"} size={20} color={wishlisted ? "#EF4444" : "#94A3B8"} />
+          <Icon
+            name={wishlisted ? 'heart' : 'heart-outline'}
+            size={20}
+            color={wishlisted ? '#EF4444' : '#94A3B8'}
+          />
         </Pressable>
       </View>
       <Text numberOfLines={1} style={styles.referenceStore}>
@@ -31,7 +32,10 @@ export function ReferenceProduct({ product, onPress, wishlisted, onWish }) {
       <Text numberOfLines={2} style={styles.referenceProductName}>
         {product.name}
       </Text>
-      <View style={styles.referenceRating}><Icon name="star" size={13} color="#F59E0B" /><Text style={styles.referenceRatingText}>{product.rating}</Text></View>
+      <View style={styles.referenceRating}>
+        <Icon name="star" size={13} color="#F59E0B" />
+        <Text style={styles.referenceRatingText}>{product.rating}</Text>
+      </View>
       <View style={styles.referencePriceLine}>
         <Text style={styles.referencePrice}>{money(product.price)}</Text>
         <Text style={styles.referenceSold}>{product.sold} sold</Text>
@@ -72,7 +76,6 @@ export function ProductGrid({ products, wishlist, onWishlist, onPress }) {
   );
 }
 
-
 export function InfoRow({ icon, title, body }) {
   return (
     <View style={styles.infoRow}>
@@ -85,7 +88,6 @@ export function InfoRow({ icon, title, body }) {
     </View>
   );
 }
-
 
 export function Header({ title, onBack }) {
   return (

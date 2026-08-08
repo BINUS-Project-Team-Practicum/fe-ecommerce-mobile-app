@@ -1,12 +1,5 @@
-import {
-  ImageBackground,
-  Pressable,
-  ScrollView,
-  Text,
-  TextInput,
-  View,
-} from "react-native";
-import { categories } from "../../data/mockData";
+import { ImageBackground, Pressable, ScrollView, Text, TextInput, View } from 'react-native';
+import { categories } from '../../data/mockData';
 import {
   Button,
   Badge,
@@ -15,27 +8,29 @@ import {
   ProductCard,
   SectionTitle,
   colors,
-} from "../../components/ui";
-import { Icon } from "../../components/Icon";
-import { ProductGrid, ReferenceProduct } from "../shared/MarketplaceComponents";
-import { sans } from "../shared/sharedStyles";
-import { styles } from "./homeStyles";
+} from '../../components/ui';
+import { Icon } from '../../components/Icon';
+import { Header, ProductGrid, ReferenceProduct } from '../shared/MarketplaceComponents';
+import { sans } from '../shared/sharedStyles';
+import { styles } from './homeStyles';
 
 export function BottomNav({ page, setPage }) {
   const nav = [
-    ["home", "home-outline", "Beranda"],
-    ["explore", "compass-outline", "Explore"],
-    ["wishlist", "heart-outline", "Favorit"],
-    ["profile", "person-outline", "Akun"],
+    ['home', 'home-outline', 'Beranda'],
+    ['explore', 'compass-outline', 'Explore'],
+    ['wishlist', 'heart-outline', 'Favorit'],
+    ['profile', 'person-outline', 'Akun'],
   ];
   return (
     <View style={styles.bottomNav}>
       {nav.map(([id, icon, label]) => (
         <Pressable key={id} onPress={() => setPage(id)} style={styles.navItem}>
-          <Icon name={page === id ? icon.replace("-outline", "") : icon} size={21} color={page === id ? colors.primary : "#94A3B8"} />
-          <Text style={[styles.navLabel, page === id && styles.navActive]}>
-            {label}
-          </Text>
+          <Icon
+            name={page === id ? icon.replace('-outline', '') : icon}
+            size={21}
+            color={page === id ? colors.primary : '#94A3B8'}
+          />
+          <Text style={[styles.navLabel, page === id && styles.navActive]}>{label}</Text>
         </Pressable>
       ))}
     </View>
@@ -55,63 +50,45 @@ export function HomeScreen({
   const cartItemCount = cart.reduce((total, item) => total + item.quantity, 0);
   const openCategory = (category) => {
     setQuery(category);
-    navigate("search");
+    navigate('search');
   };
   const openAllProducts = () => {
-    setQuery("");
-    navigate("search");
+    setQuery('');
+    navigate('search');
   };
   return (
-    <ScrollView
-      showsVerticalScrollIndicator={false}
-      contentContainerStyle={styles.homeScroll}
-    >
+    <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={styles.homeScroll}>
       <View style={styles.homeHeader}>
         <View style={styles.delivery}>
           <Icon name="location-outline" size={18} color={colors.primary} />
           <Text style={styles.deliveryText}>
-            Deliver to{" "}
-            <Text style={styles.deliveryStrong}>South Jakarta</Text>
+            Deliver to <Text style={styles.deliveryStrong}>South Jakarta</Text>
           </Text>
         </View>
         <View style={styles.headerIcons}>
-          <IconButton icon="notifications-outline" onPress={() => navigate("notifications")} />
+          <IconButton icon="notifications-outline" onPress={() => navigate('notifications')} />
           <IconButton
             icon="bag-handle-outline"
             badge={cartItemCount || null}
-            onPress={() => navigate("cart")}
+            onPress={() => navigate('cart')}
           />
         </View>
       </View>
-      <Pressable
-        onPress={() => navigate("search")}
-        style={styles.referenceSearch}
-      >
+      <Pressable onPress={() => navigate('search')} style={styles.referenceSearch}>
         <Icon name="search-outline" size={20} color="#98A2B3" />
-        <Text style={styles.referenceSearchText}>
-          Search products, brands, or stores
-        </Text>
+        <Text style={styles.referenceSearchText}>Search products, brands, or stores</Text>
       </Pressable>
       <ImageBackground
         imageStyle={styles.heroImage}
         source={{
-          uri: "https://images.unsplash.com/photo-1612902456551-333ac5afa26e?auto=format&fit=crop&w=900&q=80",
+          uri: 'https://images.unsplash.com/photo-1612902456551-333ac5afa26e?auto=format&fit=crop&w=900&q=80',
         }}
         style={styles.referenceHero}
       >
         <View style={styles.heroOverlay}>
-          <Text style={styles.referenceHeroTitle}>
-            Save up to 70% today
-          </Text>
-          <Text style={styles.referenceHeroCopy}>
-            Curated picks from stores you can trust
-          </Text>
-          <Button
-            label="Shop now"
-            variant="outline"
-            small
-            onPress={openAllProducts}
-          />
+          <Text style={styles.referenceHeroTitle}>Save up to 70% today</Text>
+          <Text style={styles.referenceHeroCopy}>Curated picks from stores you can trust</Text>
+          <Button label="Shop now" variant="outline" small onPress={openAllProducts} />
         </View>
       </ImageBackground>
       <View style={styles.referenceSectionLine}>
@@ -120,7 +97,9 @@ export function HomeScreen({
           <Text style={styles.referenceHeading}>Flash Sale</Text>
           <Badge label="Limited" tone="neutral" />
         </View>
-        <Pressable onPress={openAllProducts}><Text style={styles.seeAll}>View all</Text></Pressable>
+        <Pressable onPress={openAllProducts}>
+          <Text style={styles.seeAll}>View all</Text>
+        </Pressable>
       </View>
       <ScrollView
         horizontal
@@ -131,7 +110,7 @@ export function HomeScreen({
           <ReferenceProduct
             key={p.id}
             product={p}
-            onPress={() => navigate("detail", p)}
+            onPress={() => navigate('detail', p)}
             wishlisted={wishlist.includes(p.id)}
             onWish={() => onToggleWishlist(p.id)}
           />
@@ -139,7 +118,9 @@ export function HomeScreen({
       </ScrollView>
       <View style={styles.referenceSectionLine}>
         <Text style={styles.referenceHeading}>Categories</Text>
-        <Pressable onPress={() => navigate("categories")}><Text style={styles.seeAll}>View all</Text></Pressable>
+        <Pressable onPress={() => navigate('categories')}>
+          <Text style={styles.seeAll}>View all</Text>
+        </Pressable>
       </View>
       <View style={styles.categoryGrid}>
         {categories.slice(1, 5).map(([icon, label]) => (
@@ -162,7 +143,9 @@ export function HomeScreen({
           <Icon name="trending-up-outline" size={18} color="#3B82F6" />
           <Text style={styles.referenceHeading}>Best Sellers</Text>
         </View>
-        <Pressable onPress={openAllProducts}><Text style={styles.seeAll}>View all</Text></Pressable>
+        <Pressable onPress={openAllProducts}>
+          <Text style={styles.seeAll}>View all</Text>
+        </Pressable>
       </View>
       <ScrollView
         horizontal
@@ -170,42 +153,46 @@ export function HomeScreen({
         contentContainerStyle={styles.horizontalProducts}
       >
         {products.slice(2, 4).map((p) => (
-            <ReferenceProduct
-              key={`best-${p.id}`}
-              product={p}
-              onPress={() => navigate("detail", p)}
-              wishlisted={wishlist.includes(p.id)}
-              onWish={() => onToggleWishlist(p.id)}
-            />
-          ))}
+          <ReferenceProduct
+            key={`best-${p.id}`}
+            product={p}
+            onPress={() => navigate('detail', p)}
+            wishlisted={wishlist.includes(p.id)}
+            onWish={() => onToggleWishlist(p.id)}
+          />
+        ))}
       </ScrollView>
       <View style={styles.referenceSectionLine}>
         <View style={styles.referenceSectionTitle}>
           <Icon name="shield-checkmark-outline" size={18} color="#F59E0B" />
           <Text style={styles.referenceHeading}>Official Stores</Text>
         </View>
-        <Pressable onPress={() => navigate("store")}><Text style={styles.seeAll}>View all</Text></Pressable>
+        <Pressable onPress={() => navigate('store')}>
+          <Text style={styles.seeAll}>View all</Text>
+        </Pressable>
       </View>
       <ScrollView
         horizontal
         showsHorizontalScrollIndicator={false}
         contentContainerStyle={styles.storeScroller}
       >
-        {["Tech Haven", "Move Society", "Aster Beauty", "Atelier Home"].map(
-          (store, i) => (
-            <Pressable
-              key={store}
-              onPress={() => navigate("store")}
-              style={styles.officialCard}
-            >
-              <View style={styles.officialIcon}>
-                <Icon name={["footsteps-outline", "headset-outline", "laptop-outline", "bag-handle-outline"][i]} size={27} color={colors.primary} />
-              </View>
-              <Text style={styles.officialName}>{store}</Text>
-              <Text style={styles.officialBadge}>Verified seller</Text>
-            </Pressable>
-          ),
-        )}
+        {['Tech Haven', 'Move Society', 'Aster Beauty', 'Atelier Home'].map((store, i) => (
+          <Pressable key={store} onPress={() => navigate('store')} style={styles.officialCard}>
+            <View style={styles.officialIcon}>
+              <Icon
+                name={
+                  ['footsteps-outline', 'headset-outline', 'laptop-outline', 'bag-handle-outline'][
+                    i
+                  ]
+                }
+                size={27}
+                color={colors.primary}
+              />
+            </View>
+            <Text style={styles.officialName}>{store}</Text>
+            <Text style={styles.officialBadge}>Verified seller</Text>
+          </Pressable>
+        ))}
       </ScrollView>
       <View style={styles.personalizedHeader}>
         <View>
@@ -219,7 +206,7 @@ export function HomeScreen({
           <ProductCard
             key={`for-you-${p.id}`}
             product={p}
-            onPress={() => navigate("detail", p)}
+            onPress={() => navigate('detail', p)}
             wishlisted={wishlist.includes(p.id)}
             onWishlist={() => onToggleWishlist(p.id)}
             style={styles.recommendCard}
@@ -231,53 +218,37 @@ export function HomeScreen({
         <Icon name="checkmark" size={16} color="#fff" style={styles.trustIcon} />
         <View style={{ flex: 1 }}>
           <Text style={styles.trustTitle}>Shop with confidence at mora.</Text>
-          <Text style={styles.trustCopy}>Secure checkout · Curated products · Support when you need it</Text>
+          <Text style={styles.trustCopy}>
+            Secure checkout · Curated products · Support when you need it
+          </Text>
         </View>
       </View>
-      {!user ? <View style={styles.infoBanner}>
-        <Text style={styles.infoBannerTitle}>Make shopping more personal</Text>
-        <Text style={styles.infoBannerText}>
-          Get tailored recommendations, vouchers, and order updates.
-        </Text>
-        <Button label="Sign in" small onPress={onLogin} />
-      </View> : null}
+      {!user ? (
+        <View style={styles.infoBanner}>
+          <Text style={styles.infoBannerTitle}>Make shopping more personal</Text>
+          <Text style={styles.infoBannerText}>
+            Get tailored recommendations, vouchers, and order updates.
+          </Text>
+          <Button label="Sign in" small onPress={onLogin} />
+        </View>
+      ) : null}
     </ScrollView>
   );
 }
 
-export function SearchScreen({
-  products,
-  wishlist,
-  onToggleWishlist,
-  navigate,
-  query,
-  setQuery,
-}) {
+export function SearchScreen({ products, wishlist, onToggleWishlist, navigate, query, setQuery }) {
   const filtered = products.filter(
     (p) =>
       p.name.toLowerCase().includes(query.toLowerCase()) ||
       p.store.toLowerCase().includes(query.toLowerCase()) ||
       p.category?.toLowerCase() === query.toLowerCase(),
   );
-  const recentSearches = [
-    "wireless headphones",
-    "running shoes",
-    "minimal watch",
-    "coffee maker",
-  ];
-  const trending = [
-    "Air Max",
-    "Smart Watch",
-    "Noise Cancelling",
-    "Leather Bag",
-  ];
+  const recentSearches = ['wireless headphones', 'running shoes', 'minimal watch', 'coffee maker'];
+  const trending = ['Air Max', 'Smart Watch', 'Noise Cancelling', 'Leather Bag'];
   return (
     <View style={styles.page}>
       <View style={styles.searchToolbar}>
-        <Pressable
-          onPress={() => navigate("home")}
-          style={styles.searchRoundButton}
-        >
+        <Pressable onPress={() => navigate('home')} style={styles.searchRoundButton}>
           <Icon name="chevron-back" size={25} color="#344054" />
         </Pressable>
         <View style={styles.referenceSearchInput}>
@@ -306,11 +277,7 @@ export function SearchScreen({
             <Text style={styles.searchGroupTitle}>RECENT SEARCHES</Text>
             <View style={styles.recentSearches}>
               {recentSearches.map((item) => (
-                <Pressable
-                  key={item}
-                  onPress={() => setQuery(item)}
-                  style={styles.recentChip}
-                >
+                <Pressable key={item} onPress={() => setQuery(item)} style={styles.recentChip}>
                   <Icon name="time-outline" size={16} color="#64748B" />
                   <Text style={styles.recentText}>{item}</Text>
                 </Pressable>
@@ -319,11 +286,7 @@ export function SearchScreen({
             <Text style={styles.searchGroupTitle}>TRENDING</Text>
             <View style={styles.trendingSearches}>
               {trending.map((item) => (
-                <Pressable
-                  key={item}
-                  onPress={() => setQuery(item)}
-                  style={styles.trendingChip}
-                >
+                <Pressable key={item} onPress={() => setQuery(item)} style={styles.trendingChip}>
                   <Icon name="trending-up-outline" size={16} color={colors.primary} />
                   <Text style={styles.trendingText}>{item}</Text>
                 </Pressable>
@@ -340,7 +303,7 @@ export function SearchScreen({
           products={filtered}
           wishlist={wishlist}
           onWishlist={onToggleWishlist}
-          onPress={(p) => navigate("detail", p)}
+          onPress={(p) => navigate('detail', p)}
         />
       </ScrollView>
     </View>
@@ -359,7 +322,7 @@ function TextInputProxy({ value, onChange }) {
         color: colors.text,
         fontFamily: sans,
         fontSize: 14,
-        fontWeight: "500",
+        fontWeight: '500',
       }}
     />
   );
@@ -368,25 +331,21 @@ function TextInputProxy({ value, onChange }) {
 export function CategoriesScreen({ navigate }) {
   return (
     <ScrollView contentContainerStyle={styles.scroll}>
-      <Header title="Kategori" onBack={() => navigate("home")} />
-      <Text style={styles.resultCount}>
-        Pilih kategori yang ingin kamu jelajahi
-      </Text>
+      <Header title="Kategori" onBack={() => navigate('home')} />
+      <Text style={styles.resultCount}>Pilih kategori yang ingin kamu jelajahi</Text>
       <View style={styles.fullCategoryGrid}>
-        {categories
-          .concat(categories.slice(1, 5))
-          .map(([icon, label], index) => (
-            <Pressable
-              key={`${label}${index}`}
-              onPress={() => navigate("search")}
-              style={styles.fullCategory}
-            >
-              <View style={styles.fullCategoryIcon}>
+        {categories.concat(categories.slice(1, 5)).map(([icon, label], index) => (
+          <Pressable
+            key={`${label}${index}`}
+            onPress={() => navigate('search')}
+            style={styles.fullCategory}
+          >
+            <View style={styles.fullCategoryIcon}>
               <Icon name={icon} size={25} color={colors.primary} />
-              </View>
-              <Text style={styles.fullCategoryText}>{label}</Text>
-            </Pressable>
-          ))}
+            </View>
+            <Text style={styles.fullCategoryText}>{label}</Text>
+          </Pressable>
+        ))}
       </View>
       <SectionTitle title="Toko resmi pilihan" />
       <View style={styles.storeRow}>
@@ -395,12 +354,7 @@ export function CategoriesScreen({ navigate }) {
           <Text style={styles.storeName}>Aster Official Store</Text>
           <Text style={styles.storeInfo}>Rating 4.9 · Online 5 menit lalu</Text>
         </View>
-        <Button
-          label="Kunjungi"
-          small
-          variant="outline"
-          onPress={() => navigate("store")}
-        />
+        <Button label="Kunjungi" small variant="outline" onPress={() => navigate('store')} />
       </View>
     </ScrollView>
   );
