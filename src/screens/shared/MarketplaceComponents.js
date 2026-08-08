@@ -2,7 +2,7 @@ import { Image, Pressable, Text, useWindowDimensions, View } from "react-native"
 import { money } from "../../data/mockData";
 import { ProductCard } from "../../components/ui";
 import { Icon } from "../../components/Icon";
-import { styles } from "./marketplaceStyles";
+import { styles } from "./marketplaceComponentStyles";
 
 export function ReferenceProduct({ product, onPress, wishlisted, onWish }) {
   return (

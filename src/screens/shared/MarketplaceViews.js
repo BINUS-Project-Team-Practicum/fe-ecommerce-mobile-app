@@ -1,12 +1,12 @@
 import { useEffect, useRef, useState } from "react";
 import { Animated, View } from "react-native";
 import { colors } from "../../components/ui";
-import { SplashScreen, OnboardingScreen, AuthScreen } from "../auth/MarketplaceAuthViews";
 import { BottomNav, CategoriesScreen, HomeScreen, SearchScreen } from "../home/MarketplaceHomeViews";
-import { CartScreen, CheckoutScreen, OrderSuccessScreen, ProductDetailScreen } from "../shopping/MarketplaceShoppingViews";
+import CartScreen from "../shopping/CartScreen";
+import CheckoutScreen from "../shopping/CheckoutScreen";
+import OrderSuccessScreen from "../shopping/OrderSuccessScreen";
+import ProductDetailScreen from "../shopping/ProductDetailScreen";
 import { AccountUtilityScreen } from "../account/MarketplaceAccountViews";
-
-export { SplashScreen, OnboardingScreen, AuthScreen, CategoriesScreen, HomeScreen, SearchScreen, CartScreen, CheckoutScreen, OrderSuccessScreen, ProductDetailScreen, AccountUtilityScreen };
 
 export function AppShell(props) {
   const [page, setPage] = useState("home");

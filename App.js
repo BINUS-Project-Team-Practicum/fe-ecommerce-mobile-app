@@ -3,7 +3,8 @@ import { SafeAreaView, StatusBar } from 'react-native';
 import { useFonts } from 'expo-font';
 import Ionicons from '@expo/vector-icons/Ionicons';
 import * as SecureStore from 'expo-secure-store';
-import { AppShell, AuthScreen, OnboardingScreen, SplashScreen } from './src/screens/AppScreens';
+import { AuthScreen, OnboardingScreen, SplashScreen } from "./src/screens/auth/MarketplaceAuthViews";
+import { AppShell } from "./src/screens/shared/MarketplaceViews";
 import { demoProducts } from './src/data/mockData';
 
 const STORAGE_KEY = 'mora-marketplace-state';

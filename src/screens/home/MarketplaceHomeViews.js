@@ -18,7 +18,8 @@ import {
 } from "../../components/ui";
 import { Icon } from "../../components/Icon";
 import { ProductGrid, ReferenceProduct } from "../shared/MarketplaceComponents";
-import { sans, styles } from "../shared/marketplaceStyles";
+import { sans } from "../shared/sharedStyles";
+import { styles } from "./homeStyles";
 
 export function BottomNav({ page, setPage }) {
   const nav = [
@@ -45,10 +46,21 @@ export function HomeScreen({
   products,
   cart,
   wishlist,
+  user,
   onToggleWishlist,
   onLogin,
   navigate,
+  setQuery,
 }) {
+  const cartItemCount = cart.reduce((total, item) => total + item.quantity, 0);
+  const openCategory = (category) => {
+    setQuery(category);
+    navigate("search");
+  };
+  const openAllProducts = () => {
+    setQuery("");
+    navigate("search");
+  };
   return (
     <ScrollView
       showsVerticalScrollIndicator={false}
@@ -58,15 +70,15 @@ export function HomeScreen({
         <View style={styles.delivery}>
           <Icon name="location-outline" size={18} color={colors.primary} />
           <Text style={styles.deliveryText}>
-            Dikirim ke{" "}
-            <Text style={styles.deliveryStrong}>Jakarta Selatan</Text>⌄
+            Deliver to{" "}
+            <Text style={styles.deliveryStrong}>South Jakarta</Text>
           </Text>
         </View>
         <View style={styles.headerIcons}>
           <IconButton icon="notifications-outline" onPress={() => navigate("notifications")} />
           <IconButton
             icon="bag-handle-outline"
-            badge={cart.length || null}
+            badge={cartItemCount || null}
             onPress={() => navigate("cart")}
           />
         </View>
@@ -77,11 +89,8 @@ export function HomeScreen({
       >
         <Icon name="search-outline" size={20} color="#98A2B3" />
         <Text style={styles.referenceSearchText}>
-          Cari produk, brand, atau toko
+          Search products, brands, or stores
         </Text>
-        <View style={styles.aiChip}>
-          <Text style={styles.aiText}>AI</Text>
-        </View>
       </Pressable>
       <ImageBackground
         imageStyle={styles.heroImage}
@@ -92,46 +101,33 @@ export function HomeScreen({
       >
         <View style={styles.heroOverlay}>
           <Text style={styles.referenceHeroTitle}>
-            Momen Hemat Hingga 70%
+            Save up to 70% today
           </Text>
           <Text style={styles.referenceHeroCopy}>
-            Temukan pilihan terbaik untuk harimu
+            Curated picks from stores you can trust
           </Text>
           <Button
-            label="Belanja sekarang  →"
+            label="Shop now"
             variant="outline"
             small
-            onPress={() => navigate("search")}
+            onPress={openAllProducts}
           />
         </View>
       </ImageBackground>
-      <View style={styles.carouselDots}>
-        <View style={styles.carouselActive} />
-        <View style={styles.carouselDot} />
-        <View style={styles.carouselDot} />
-      </View>
       <View style={styles.referenceSectionLine}>
         <View style={styles.referenceSectionTitle}>
           <Icon name="flash-outline" size={20} color="#FF7A00" />
           <Text style={styles.referenceHeading}>Flash Sale</Text>
-          <View style={styles.timer}>
-            <Text>01:</Text>
-          </View>
-          <View style={styles.timer}>
-            <Text>23:</Text>
-          </View>
-          <View style={styles.timer}>
-            <Text>45</Text>
-          </View>
+          <Badge label="Limited" tone="neutral" />
         </View>
-        <Text style={styles.seeAll}>Lihat semua</Text>
+        <Pressable onPress={openAllProducts}><Text style={styles.seeAll}>View all</Text></Pressable>
       </View>
       <ScrollView
         horizontal
         showsHorizontalScrollIndicator={false}
         contentContainerStyle={styles.horizontalProducts}
       >
-        {products.slice(0, 4).map((p) => (
+        {products.slice(0, 2).map((p) => (
           <ReferenceProduct
             key={p.id}
             product={p}
@@ -143,13 +139,13 @@ export function HomeScreen({
       </ScrollView>
       <View style={styles.referenceSectionLine}>
         <Text style={styles.referenceHeading}>Categories</Text>
-        <Pressable onPress={() => navigate("categories")}><Text style={styles.seeAll}>Semua</Text></Pressable>
+        <Pressable onPress={() => navigate("categories")}><Text style={styles.seeAll}>View all</Text></Pressable>
       </View>
       <View style={styles.categoryGrid}>
         {categories.slice(1, 5).map(([icon, label]) => (
           <Pressable
             key={label}
-            onPress={() => navigate("search")}
+            onPress={() => openCategory(label)}
             style={styles.referenceCategory}
           >
             <View style={styles.referenceCategoryIcon}>
@@ -166,17 +162,14 @@ export function HomeScreen({
           <Icon name="trending-up-outline" size={18} color="#3B82F6" />
           <Text style={styles.referenceHeading}>Best Sellers</Text>
         </View>
-        <Text style={styles.seeAll}>Lihat semua</Text>
+        <Pressable onPress={openAllProducts}><Text style={styles.seeAll}>View all</Text></Pressable>
       </View>
       <ScrollView
         horizontal
         showsHorizontalScrollIndicator={false}
         contentContainerStyle={styles.horizontalProducts}
       >
-        {products
-          .slice(4)
-          .concat(products.slice(0, 2))
-          .map((p) => (
+        {products.slice(2, 4).map((p) => (
             <ReferenceProduct
               key={`best-${p.id}`}
               product={p}
@@ -191,13 +184,14 @@ export function HomeScreen({
           <Icon name="shield-checkmark-outline" size={18} color="#F59E0B" />
           <Text style={styles.referenceHeading}>Official Stores</Text>
         </View>
+        <Pressable onPress={() => navigate("store")}><Text style={styles.seeAll}>View all</Text></Pressable>
       </View>
       <ScrollView
         horizontal
         showsHorizontalScrollIndicator={false}
         contentContainerStyle={styles.storeScroller}
       >
-        {["NikeOfficial", "SoundHub", "TechWorld", "StyleCo"].map(
+        {["Tech Haven", "Move Society", "Aster Beauty", "Atelier Home"].map(
           (store, i) => (
             <Pressable
               key={store}
@@ -208,20 +202,20 @@ export function HomeScreen({
                 <Icon name={["footsteps-outline", "headset-outline", "laptop-outline", "bag-handle-outline"][i]} size={27} color={colors.primary} />
               </View>
               <Text style={styles.officialName}>{store}</Text>
-              <Text style={styles.officialBadge}>Official Store</Text>
+              <Text style={styles.officialBadge}>Verified seller</Text>
             </Pressable>
           ),
         )}
       </ScrollView>
       <View style={styles.personalizedHeader}>
         <View>
-          <Text style={styles.personalizedEyebrow}>DIPILIH UNTUKMU</Text>
-          <Text style={styles.personalizedTitle}>Temukan yang kamu suka</Text>
+          <Text style={styles.personalizedEyebrow}>PICKED FOR YOU</Text>
+          <Text style={styles.personalizedTitle}>Discover your next favorite</Text>
         </View>
-        <Badge label="Untukmu" tone="info" />
+        <Badge label="For you" tone="info" />
       </View>
       <View style={styles.recommendGrid}>
-        {products.slice(2, 6).map((p) => (
+        {products.slice(4, 6).map((p) => (
           <ProductCard
             key={`for-you-${p.id}`}
             product={p}
@@ -236,17 +230,17 @@ export function HomeScreen({
       <View style={styles.trustStrip}>
         <Icon name="checkmark" size={16} color="#fff" style={styles.trustIcon} />
         <View style={{ flex: 1 }}>
-          <Text style={styles.trustTitle}>Belanja nyaman bersama mora.</Text>
-          <Text style={styles.trustCopy}>Pembayaran aman · Produk terkurasi · Bantuan 24/7</Text>
+          <Text style={styles.trustTitle}>Shop with confidence at mora.</Text>
+          <Text style={styles.trustCopy}>Secure checkout · Curated products · Support when you need it</Text>
         </View>
       </View>
-      <View style={styles.infoBanner}>
-        <Text style={styles.infoBannerTitle}>Belanja lebih personal dengan akun</Text>
+      {!user ? <View style={styles.infoBanner}>
+        <Text style={styles.infoBannerTitle}>Make shopping more personal</Text>
         <Text style={styles.infoBannerText}>
-          Dapatkan rekomendasi, voucher, dan status pesananmu.
+          Get tailored recommendations, vouchers, and order updates.
         </Text>
-        <Button label="Masuk" small onPress={onLogin} />
-      </View>
+        <Button label="Sign in" small onPress={onLogin} />
+      </View> : null}
     </ScrollView>
   );
 }
@@ -262,7 +256,8 @@ export function SearchScreen({
   const filtered = products.filter(
     (p) =>
       p.name.toLowerCase().includes(query.toLowerCase()) ||
-      p.store.toLowerCase().includes(query.toLowerCase()),
+      p.store.toLowerCase().includes(query.toLowerCase()) ||
+      p.category?.toLowerCase() === query.toLowerCase(),
   );
   const recentSearches = [
     "wireless headphones",

@@ -3,7 +3,7 @@ import { Alert, Pressable, ScrollView, Switch, Text, View } from "react-native";
 import { EmptyState, Button, SectionTitle } from "../../components/ui";
 import { Icon } from "../../components/Icon";
 import { Header, MenuGroup, ProductGrid } from "../shared/MarketplaceComponents";
-import { styles } from "../shared/marketplaceStyles";
+import { styles } from "./accountStyles";
 
 const pageTitles = {
   categories: "Kategori", wishlist: "Wishlist", notifications: "Notifikasi", profile: "Akun Saya", orders: "Pesanan Saya", coupons: "Kupon Saya", wallet: "Dompet", settings: "Pengaturan", chat: "Pesan", store: "Toko", tracking: "Lacak Pesanan", payment: "Pembayaran",

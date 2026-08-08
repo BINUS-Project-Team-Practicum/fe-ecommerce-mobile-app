@@ -2,7 +2,7 @@ import { useState } from "react";
 import { Alert, Pressable, ScrollView, Text, TextInput, View } from "react-native";
 import { Button } from "../../components/ui";
 import { Icon } from "../../components/Icon";
-import { styles } from "../shared/marketplaceStyles";
+import { styles } from "./authStyles";
 
 export function SplashScreen() {
   return (
