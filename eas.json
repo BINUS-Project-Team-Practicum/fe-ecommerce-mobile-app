@@ -6,7 +6,7 @@
     "preview": {
       "distribution": "internal",
       "env": {
-        "EXPO_PUBLIC_API_URL": "https://marketplace-backend-x8im.onrender.com/api"
+        "EXPO_PUBLIC_API_URL": "https://bion-marketplace-backend.onrender.com/api"
       },
       "android": {
         "buildType": "apk"
