@@ -1,5 +1,5 @@
 import { Image, Pressable, Text, useWindowDimensions, View } from 'react-native';
-import { money } from '../../data/mockData';
+import { money } from '../../utils/format';
 import { ProductCard } from '../../components/ui';
 import { Icon } from '../../components/Icon';
 import { styles } from './marketplaceComponentStyles';

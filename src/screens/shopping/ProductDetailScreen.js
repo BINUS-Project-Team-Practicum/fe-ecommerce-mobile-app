@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { Image, Pressable, ScrollView, Text, View } from 'react-native';
-import { money } from '../../data/mockData';
+import { money } from '../../utils/format';
 import { Button, EmptyState, IconButton, Rating, Toast } from '../../components/ui';
 import { Icon } from '../../components/Icon';
 import { getProduct } from '../../api/client';

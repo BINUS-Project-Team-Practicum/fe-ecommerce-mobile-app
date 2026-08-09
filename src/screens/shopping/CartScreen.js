@@ -1,5 +1,5 @@
 import { Image, ScrollView, Text, View } from 'react-native';
-import { money } from '../../data/mockData';
+import { money } from '../../utils/format';
 import { Button, EmptyState, QuantitySelector } from '../../components/ui';
 import { Header } from '../shared/MarketplaceComponents';
 import { styles } from './shoppingStyles';

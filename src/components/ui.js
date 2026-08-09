@@ -9,7 +9,7 @@ import {
   View,
 } from 'react-native';
 import { useEffect, useRef, useState } from 'react';
-import { money } from '../data/mockData';
+import { money } from '../utils/format';
 import { Icon } from './Icon';
 
 export const colors = {
