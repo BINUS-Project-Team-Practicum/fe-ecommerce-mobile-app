@@ -22,6 +22,7 @@ export default function ProductDetailScreen({
   wishlist,
   onToggleWishlist,
   onAddToCart,
+  goBack,
   navigate,
 }) {
   const [variant, setVariant] = useState(VARIANTS[0][0]);
@@ -53,7 +54,7 @@ export default function ProductDetailScreen({
       <ScrollView contentContainerStyle={{ paddingBottom: 106 }}>
         <DetailHeader
           isWishlisted={isWishlisted}
-          onBack={() => navigate('home')}
+          onBack={goBack}
           onWishlist={() => onToggleWishlist(product.id)}
         />
         <ProductGallery product={product} />
@@ -124,21 +125,34 @@ function DetailHeader({ isWishlisted, onBack, onWishlist }) {
 }
 
 function ProductGallery({ product }) {
+  const images = product.images?.filter(Boolean).slice(0, 3) || [];
+  const galleryImages = [...images];
+  while (galleryImages.length < 3) galleryImages.push(galleryImages[0] || product.image);
+  const [activeImage, setActiveImage] = useState(0);
+
+  useEffect(() => setActiveImage(0), [product.id]);
+
   return (
     <View style={styles.detailGallery}>
-      <Image source={{ uri: product.image }} style={styles.detailImage} />
+      <Image source={{ uri: galleryImages[activeImage] }} style={styles.detailImage} />
       <View style={styles.detailThumbnails}>
-        {[0, 1, 2].map((index) => (
-          <View
+        {galleryImages.map((image, index) => (
+          <Pressable
             key={index}
-            style={[styles.detailThumbnail, index === 0 && styles.detailThumbnailActive]}
+            accessibilityRole="button"
+            accessibilityLabel={`Pilih gambar ${index + 1}`}
+            accessibilityState={{ selected: activeImage === index }}
+            onPress={() => setActiveImage(index)}
+            style={[styles.detailThumbnail, activeImage === index && styles.detailThumbnailActive]}
           >
-            <Image source={{ uri: product.image }} style={styles.thumbnailImage} />
-          </View>
+            <Image source={{ uri: image }} style={styles.thumbnailImage} />
+          </Pressable>
         ))}
       </View>
       <View style={styles.galleryCount}>
-        <Text style={styles.galleryCountText}>1/3</Text>
+        <Text style={styles.galleryCountText}>
+          {activeImage + 1}/{galleryImages.length}
+        </Text>
       </View>
     </View>
   );

@@ -1,33 +1,33 @@
 {
   "expo": {
-    "name": "Ecommerce Marketplace",
-    "slug": "ecommerce-marketplace",
+    "name": "Binus Marketplace",
+    "slug": "binus-marketplace",
+    "scheme": "binus-marketplace",
+    "icon": "./src/public/binus-marketplace-app-icon.png",
     "version": "1.0.0",
     "orientation": "portrait",
     "userInterfaceStyle": "light",
     "splash": {
+      "image": "./src/public/binus-marketplace-app-icon.png",
       "resizeMode": "contain",
-      "backgroundColor": "#f8fafc"
+      "backgroundColor": "#0CC7A4"
     },
-    "assetBundlePatterns": [
-      "**/*"
-    ],
+    "assetBundlePatterns": ["**/*"],
     "ios": {
       "supportsTablet": true,
       "bundleIdentifier": "com.ardanimith.ecommercemarketplace"
     },
     "android": {
       "adaptiveIcon": {
-        "backgroundColor": "#f8fafc"
+        "foregroundImage": "./src/public/binus-marketplace-app-icon.png",
+        "backgroundColor": "#061938"
       },
       "package": "com.ardanimith.ecommercemarketplace"
     },
     "web": {
       "bundler": "metro"
     },
-    "plugins": [
-      "expo-asset"
-    ],
+    "plugins": ["expo-asset"],
     "extra": {
       "eas": {
         "projectId": "d1262dd9-9728-4d8a-8371-8d2d66715b26"

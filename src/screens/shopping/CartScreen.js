@@ -4,11 +4,11 @@ import { Button, EmptyState, QuantitySelector } from '../../components/ui';
 import { Header } from '../shared/MarketplaceComponents';
 import { styles } from './shoppingStyles';
 
-export default function CartScreen({ cart, onUpdateQuantity, navigate }) {
+export default function CartScreen({ cart, goBack, onUpdateQuantity, navigate }) {
   const total = cart.reduce((sum, item) => sum + item.price * item.quantity, 0);
   return (
     <View style={styles.page}>
-      <Header title="Cart" onBack={() => navigate('home')} />
+      <Header title="Cart" onBack={goBack} />
       {!cart.length ? (
         <EmptyCart navigate={navigate} />
       ) : (

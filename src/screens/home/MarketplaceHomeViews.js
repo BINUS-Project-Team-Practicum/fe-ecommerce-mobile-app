@@ -14,7 +14,7 @@ import { Header, ProductGrid, ReferenceProduct } from '../shared/MarketplaceComp
 import { sans } from '../shared/sharedStyles';
 import { styles } from './homeStyles';
 
-export function BottomNav({ page, setPage }) {
+export function BottomNav({ page, onNavigate }) {
   const nav = [
     ['home', 'home-outline', 'Beranda'],
     ['explore', 'compass-outline', 'Explore'],
@@ -24,7 +24,7 @@ export function BottomNav({ page, setPage }) {
   return (
     <View style={styles.bottomNav}>
       {nav.map(([id, icon, label]) => (
-        <Pressable key={id} onPress={() => setPage(id)} style={styles.navItem}>
+        <Pressable key={id} onPress={() => onNavigate(id)} style={styles.navItem}>
           <Icon
             name={page === id ? icon.replace('-outline', '') : icon}
             size={21}
@@ -45,17 +45,10 @@ export function HomeScreen({
   onToggleWishlist,
   onLogin,
   navigate,
-  setQuery,
 }) {
   const cartItemCount = cart.reduce((total, item) => total + item.quantity, 0);
-  const openCategory = (category) => {
-    setQuery(category);
-    navigate('search');
-  };
-  const openAllProducts = () => {
-    setQuery('');
-    navigate('search');
-  };
+  const openCategory = (category) => navigate('search', null, category);
+  const openAllProducts = () => navigate('search', null, '');
   return (
     <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={styles.homeScroll}>
       <View style={styles.homeHeader}>
@@ -74,7 +67,7 @@ export function HomeScreen({
           />
         </View>
       </View>
-      <Pressable onPress={() => navigate('search')} style={styles.referenceSearch}>
+      <Pressable onPress={() => navigate('search', null, '')} style={styles.referenceSearch}>
         <Icon name="search-outline" size={20} color="#98A2B3" />
         <Text style={styles.referenceSearchText}>Search products, brands, or stores</Text>
       </Pressable>
@@ -217,7 +210,7 @@ export function HomeScreen({
       <View style={styles.trustStrip}>
         <Icon name="checkmark" size={16} color="#fff" style={styles.trustIcon} />
         <View style={{ flex: 1 }}>
-          <Text style={styles.trustTitle}>Shop with confidence at mora.</Text>
+          <Text style={styles.trustTitle}>Shop with confidence at binus.</Text>
           <Text style={styles.trustCopy}>
             Secure checkout · Curated products · Support when you need it
           </Text>
@@ -236,7 +229,15 @@ export function HomeScreen({
   );
 }
 
-export function SearchScreen({ products, wishlist, onToggleWishlist, navigate, query, setQuery }) {
+export function SearchScreen({
+  products,
+  wishlist,
+  onToggleWishlist,
+  navigate,
+  goBack,
+  query,
+  setQuery,
+}) {
   const filtered = products.filter(
     (p) =>
       p.name.toLowerCase().includes(query.toLowerCase()) ||
@@ -248,7 +249,7 @@ export function SearchScreen({ products, wishlist, onToggleWishlist, navigate, q
   return (
     <View style={styles.page}>
       <View style={styles.searchToolbar}>
-        <Pressable onPress={() => navigate('home')} style={styles.searchRoundButton}>
+        <Pressable onPress={goBack} style={styles.searchRoundButton}>
           <Icon name="chevron-back" size={25} color="#344054" />
         </Pressable>
         <View style={styles.referenceSearchInput}>
@@ -328,16 +329,16 @@ function TextInputProxy({ value, onChange }) {
   );
 }
 
-export function CategoriesScreen({ navigate }) {
+export function CategoriesScreen({ goBack, navigate }) {
   return (
     <ScrollView contentContainerStyle={styles.scroll}>
-      <Header title="Kategori" onBack={() => navigate('home')} />
+      <Header title="Kategori" onBack={goBack} />
       <Text style={styles.resultCount}>Pilih kategori yang ingin kamu jelajahi</Text>
       <View style={styles.fullCategoryGrid}>
         {categories.concat(categories.slice(1, 5)).map(([icon, label], index) => (
           <Pressable
             key={`${label}${index}`}
-            onPress={() => navigate('search')}
+            onPress={() => navigate('search', null, label)}
             style={styles.fullCategory}
           >
             <View style={styles.fullCategoryIcon}>

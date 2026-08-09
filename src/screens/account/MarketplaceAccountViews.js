@@ -28,6 +28,7 @@ export function AccountUtilityScreen({
   wishlist,
   onToggleWishlist,
   onCompleteOrder,
+  goBack,
   navigate,
   onLogin,
   onLogout,
@@ -74,10 +75,14 @@ export function AccountUtilityScreen({
           <Pressable
             onPress={() => {
               if (!user) return onLogin?.();
-              Alert.alert('Keluar dari akun?', 'Anda perlu login kembali untuk mengakses akun ini.', [
-                { text: 'Batal', style: 'cancel' },
-                { text: 'Keluar', style: 'destructive', onPress: onLogout },
-              ]);
+              Alert.alert(
+                'Keluar dari akun?',
+                'Anda perlu login kembali untuk mengakses akun ini.',
+                [
+                  { text: 'Batal', style: 'cancel' },
+                  { text: 'Keluar', style: 'destructive', onPress: onLogout },
+                ],
+              );
             }}
           >
             <Text style={styles.action}>{user ? 'Keluar' : 'Masuk'}</Text>
@@ -88,7 +93,7 @@ export function AccountUtilityScreen({
           entries={[
             { id: 'orders', icon: 'receipt-outline', label: 'Pesanan Saya' },
             { id: 'coupons', icon: 'ticket-outline', label: 'Kupon Saya' },
-            { id: 'wallet', icon: 'wallet-outline', label: 'Mora Wallet' },
+            { id: 'wallet', icon: 'wallet-outline', label: 'Binus Wallet' },
           ]}
           navigate={navigate}
         />
@@ -105,7 +110,7 @@ export function AccountUtilityScreen({
   if (page === 'notifications')
     return (
       <View style={styles.page}>
-        <Header title="Notifikasi" onBack={() => navigate('home')} />
+        <Header title="Notifikasi" onBack={goBack} />
         {['Voucher spesial untukmu', 'Pesanan telah dikirim', 'Flash sale dimulai sekarang'].map(
           (x, i) => (
             <View key={x} style={styles.notification}>
@@ -133,7 +138,7 @@ export function AccountUtilityScreen({
   if (page === 'tracking')
     return (
       <ScrollView contentContainerStyle={styles.scroll}>
-        <Header title="Lacak Pesanan" onBack={() => navigate('home')} />
+        <Header title="Lacak Pesanan" onBack={goBack} />
         <View style={styles.trackingCard}>
           <View className="flex-row items-center gap-3">
             <View className="h-11 w-11 items-center justify-center rounded-2xl bg-emerald-600">
@@ -166,9 +171,9 @@ export function AccountUtilityScreen({
   if (page === 'payment')
     return (
       <ScrollView contentContainerStyle={styles.scroll}>
-        <Header title="Pilih Pembayaran" onBack={() => navigate('checkout')} />
+        <Header title="Pilih Pembayaran" onBack={goBack} />
         {[
-          'Mora Wallet  ·  Saldo Rp250.000',
+          'Binus Wallet  ·  Saldo Rp250.000',
           'Virtual Account BCA',
           'Kartu Kredit / Debit',
           'Bayar di tempat (COD)',
@@ -192,10 +197,10 @@ export function AccountUtilityScreen({
         ))}
       </ScrollView>
     );
-  const title = pageTitles[page] || 'mora.';
+  const title = pageTitles[page] || 'binus.';
   return (
     <View style={styles.page}>
-      <Header title={title} onBack={() => navigate('profile')} />
+      <Header title={title} onBack={goBack} />
       {page === 'orders' ? (
         orders?.length ? (
           <OrderHistory orders={orders} navigate={navigate} />
@@ -231,7 +236,7 @@ export function AccountUtilityScreen({
             page === 'coupons'
               ? 'Belum ada kupon'
               : page === 'wallet'
-                ? 'Mora Wallet'
+                ? 'Binus Wallet'
                 : 'Pengaturan akun'
           }
           body={

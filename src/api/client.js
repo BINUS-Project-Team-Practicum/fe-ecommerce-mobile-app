@@ -48,6 +48,7 @@ function normalizeProduct(product) {
     sold: product.sold ? String(product.sold) : 'New',
     discount: product.discount || 0,
     image: product.images?.[0],
+    images: product.images || [],
     store: product.storeName,
     location: product.location || 'Indonesia',
     badge: product.badge || 'Store',

@@ -1,17 +1,32 @@
 import { useEffect, useState } from 'react';
-import { Pressable, ScrollView, Text, TextInput, View } from 'react-native';
+import {
+  AccessibilityInfo,
+  Animated,
+  Platform,
+  Image,
+  Pressable,
+  ScrollView,
+  Text,
+  TextInput,
+  View,
+} from 'react-native';
 import { Button, Toast } from '../../components/ui';
 import { Icon } from '../../components/Icon';
 import { styles } from './authStyles';
 import { login, register as registerAccount } from '../../api/client';
 
+const supportsNativeDriver = Platform.OS !== 'web';
+
 export function SplashScreen() {
   return (
     <View style={styles.splash}>
       <View style={styles.splashLogo}>
-        <Icon name="bag-handle-outline" size={54} color="#fff" />
+        <Image
+          source={require('../../public/binus-marketplace-app-icon.png')}
+          style={styles.splashLogoImage}
+        />
       </View>
-      <Text style={styles.splashBrand}>Verdant</Text>
+      <Text style={styles.splashBrand}>Binus Marketplace</Text>
       <Text style={styles.splashCopy}>Shop Smarter. Live Better.</Text>
       <View style={styles.splashDots}>
         <View style={styles.splashDot} />
@@ -23,6 +38,9 @@ export function SplashScreen() {
 }
 export function OnboardingScreen({ onDone, onSkip }) {
   const [step, setStep] = useState(0);
+  const [reducedMotion, setReducedMotion] = useState(false);
+  const opacity = useState(() => new Animated.Value(0))[0];
+  const translateX = useState(() => new Animated.Value(0))[0];
   const slides = [
     [
       'bag-handle-outline',
@@ -33,15 +51,44 @@ export function OnboardingScreen({ onDone, onSkip }) {
     ['cube-outline', 'Delivered With Care', 'Track every order from checkout to your door.'],
   ];
   const slide = slides[step];
+
+  useEffect(() => {
+    AccessibilityInfo.isReduceMotionEnabled()
+      .then(setReducedMotion)
+      .catch(() => {});
+    const subscription = AccessibilityInfo.addEventListener(
+      'reduceMotionChanged',
+      setReducedMotion,
+    );
+    return () => subscription.remove();
+  }, []);
+
+  useEffect(() => {
+    opacity.setValue(0);
+    translateX.setValue(reducedMotion ? 0 : 12);
+    Animated.parallel([
+      Animated.timing(opacity, {
+        toValue: 1,
+        duration: reducedMotion ? 100 : 200,
+        useNativeDriver: supportsNativeDriver,
+      }),
+      Animated.timing(translateX, {
+        toValue: 0,
+        duration: reducedMotion ? 100 : 200,
+        useNativeDriver: supportsNativeDriver,
+      }),
+    ]).start();
+  }, [opacity, reducedMotion, step, translateX]);
+
   return (
     <View style={styles.referenceOnboarding}>
-      <View style={styles.onboardingGreen}>
+      <Animated.View style={[styles.onboardingGreen, { opacity, transform: [{ translateX }] }]}>
         <View style={styles.bagCircle}>
           <Icon name={slide[0]} size={84} color="#fff" />
         </View>
         <Text style={styles.referenceOnboardTitle}>{slide[1]}</Text>
         <Text style={styles.referenceOnboardCopy}>{slide[2]}</Text>
-      </View>
+      </Animated.View>
       <View style={styles.onboardingWhite}>
         <View style={styles.referenceDots}>
           {slides.map((_, i) => (

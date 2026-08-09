@@ -13,7 +13,35 @@ import { AppShell } from './src/screens/shared/MarketplaceViews';
 import { demoProducts } from './src/data/mockData';
 import { getProducts } from './src/api/client';
 
-const STORAGE_KEY = 'mora-marketplace-state';
+const STORAGE_KEY = 'binus-marketplace-state';
+const BASE64_ALPHABET = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/';
+
+function isActiveToken(token) {
+  try {
+    const payload = token.split('.')[1]?.replace(/-/g, '+').replace(/_/g, '/');
+    if (!payload) return false;
+
+    let bits = 0;
+    let buffer = 0;
+    let decoded = '';
+    for (const character of payload) {
+      if (character === '=') break;
+      const value = BASE64_ALPHABET.indexOf(character);
+      if (value < 0) return false;
+      buffer = (buffer << 6) | value;
+      bits += 6;
+      if (bits >= 8) {
+        bits -= 8;
+        decoded += String.fromCharCode((buffer >> bits) & 0xff);
+      }
+    }
+
+    const { exp } = JSON.parse(decoded);
+    return Number.isFinite(exp) && exp * 1000 > Date.now();
+  } catch {
+    return false;
+  }
+}
 
 function restoreCart(savedCart = []) {
   return savedCart.reduce((items, savedItem) => {
@@ -41,6 +69,7 @@ export default function App() {
   const [orders, setOrders] = useState([]);
   const [products, setProducts] = useState(demoProducts);
   const [isHydrated, setIsHydrated] = useState(false);
+  const [hasSavedState, setHasSavedState] = useState(false);
 
   useEffect(() => {
     const timer = setTimeout(() => setFontLoadTimedOut(true), 2500);
@@ -54,12 +83,16 @@ export default function App() {
   }, []);
 
   useEffect(() => {
+    if (!isHydrated) return undefined;
     const timer = setTimeout(
-      () => setStage((current) => (current === 'splash' ? 'onboarding' : current)),
+      () =>
+        setStage((current) =>
+          current === 'splash' ? (user ? 'app' : hasSavedState ? 'auth' : 'onboarding') : current,
+        ),
       900,
     );
     return () => clearTimeout(timer);
-  }, []);
+  }, [hasSavedState, isHydrated, user]);
 
   useEffect(() => {
     let isMounted = true;
@@ -67,13 +100,19 @@ export default function App() {
       try {
         const savedState = await SecureStore.getItemAsync(STORAGE_KEY);
         if (!savedState || !isMounted) return;
+        setHasSavedState(true);
         const {
           user: savedUser,
           cart: savedCart,
           wishlist: savedWishlist,
           orders: savedOrders,
         } = JSON.parse(savedState);
-        setUser(savedUser || null);
+        if (!isActiveToken(savedUser?.token)) {
+          if (savedUser?.token) await SecureStore.deleteItemAsync(STORAGE_KEY);
+          return;
+        }
+
+        setUser(savedUser);
         setCart(restoreCart(savedCart));
         setWishlist(savedWishlist || []);
         setOrders(savedOrders || []);

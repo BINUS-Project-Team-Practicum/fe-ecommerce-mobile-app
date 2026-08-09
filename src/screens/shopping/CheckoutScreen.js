@@ -7,12 +7,12 @@ import { styles } from './shoppingStyles';
 const SHIPPING_FEE = 15000;
 const VOUCHER_DISCOUNT = 15000;
 
-export default function CheckoutScreen({ cart, navigate }) {
+export default function CheckoutScreen({ cart, goBack, navigate }) {
   const subtotal = cart.reduce((sum, item) => sum + item.price * item.quantity, 0);
   const total = subtotal + SHIPPING_FEE - VOUCHER_DISCOUNT;
   return (
     <ScrollView contentContainerStyle={styles.scroll}>
-      <Header title="Checkout" onBack={() => navigate('cart')} />
+      <Header title="Checkout" onBack={goBack} />
       <DeliveryAddress />
       <DeliveryMethod />
       <Voucher />

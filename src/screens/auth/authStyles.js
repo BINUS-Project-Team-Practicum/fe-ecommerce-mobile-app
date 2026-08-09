@@ -3,7 +3,7 @@ import { StyleSheet } from 'react-native';
 export const styles = StyleSheet.create({
   splash: {
     flex: 1,
-    backgroundColor: '#08BFB5',
+    backgroundColor: '#0CC7A4',
     alignItems: 'center',
     justifyContent: 'center',
   },
@@ -13,9 +13,11 @@ export const styles = StyleSheet.create({
     borderRadius: 38,
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: 'rgba(255,255,255,.18)',
+    backgroundColor: '#061938',
     marginBottom: 28,
+    overflow: 'hidden',
   },
+  splashLogoImage: { width: '100%', height: '100%' },
   splashBrand: {
     color: '#fff',
     fontWeight: '900',
