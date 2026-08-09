@@ -68,7 +68,6 @@ function serializeState({ user, cart, wishlist, orders }) {
 
 export default function App() {
   const [iconsLoaded, iconLoadError] = useFonts(Ionicons.font);
-  const [fontLoadTimedOut, setFontLoadTimedOut] = useState(false);
   const [stage, setStage] = useState('splash');
   const [user, setUser] = useState(null);
   const [cart, setCart] = useState([]);
@@ -81,11 +80,6 @@ export default function App() {
   const [pendingCart, setPendingCart] = useState(null);
   const [isHydrated, setIsHydrated] = useState(false);
   const [hasSavedState, setHasSavedState] = useState(false);
-
-  useEffect(() => {
-    const timer = setTimeout(() => setFontLoadTimedOut(true), 2500);
-    return () => clearTimeout(timer);
-  }, []);
 
   useEffect(() => {
     let active = true;
@@ -240,7 +234,12 @@ export default function App() {
     await SecureStore.deleteItemAsync(STORAGE_KEY).catch(() => {});
   };
 
-  if (!iconsLoaded && !iconLoadError && !fontLoadTimedOut) return <SplashScreen />;
+  // Tunggu font Ionicons benar-benar siap. Sebelumnya ada timer 2,5 detik yang
+  // memaksa layar tampil walau font belum termuat, dan di APK mandiri timer itu
+  // sering menang — akibatnya semua ikon tergambar sebagai kotak kosong.
+  // iconLoadError tetap dibiarkan lolos supaya aplikasi tidak tertahan di splash
+  // kalau font-nya benar-benar gagal dimuat.
+  if (!iconsLoaded && !iconLoadError) return <SplashScreen />;
 
   return (
     <SafeAreaView className="flex-1 bg-canvas" style={{ flex: 1, backgroundColor: '#F8FAFC' }}>
