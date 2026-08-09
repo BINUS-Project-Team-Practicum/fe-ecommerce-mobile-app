@@ -3,12 +3,18 @@ import { colors } from '../../components/ui';
 import { sharedStyles } from '../shared/sharedStyles';
 
 const localStyles = StyleSheet.create({
-  detailTop: { height: 0, position: 'relative', zIndex: 3 },
-  detailTopActions: { flexDirection: 'row', gap: 10 },
-  floatingBack: {
+  detailTop: {
     position: 'absolute',
+    zIndex: 3,
     top: 18,
     left: 16,
+    right: 16,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+  },
+  detailTopActions: { flexDirection: 'row', gap: 10 },
+  floatingBack: {
     width: 44,
     height: 44,
     borderRadius: 22,
@@ -69,8 +75,9 @@ const localStyles = StyleSheet.create({
     paddingHorizontal: 20,
     marginTop: 12,
     gap: 9,
+    flexWrap: 'wrap',
   },
-  detailPrice: { color: '#101828', fontSize: 24, fontWeight: '900' },
+  detailPrice: { color: '#101828', fontSize: 24, fontWeight: '900', flexShrink: 1 },
   detailOldPrice: { color: '#98A2B3', fontSize: 13, textDecorationLine: 'line-through' },
   detailDiscount: { color: '#E11D48', fontSize: 12, fontWeight: '800' },
   detailMeta: {
@@ -153,12 +160,14 @@ const localStyles = StyleSheet.create({
   detailReview: { margin: 20, backgroundColor: '#F8FAFC', padding: 14, borderRadius: 14, gap: 7 },
   stickyCta: {
     flexDirection: 'row',
+    alignItems: 'center',
     gap: 9,
     padding: 12,
     backgroundColor: '#fff',
     borderTopWidth: 1,
     borderColor: '#E5E7EB',
   },
+  ctaButton: { flex: 1 },
   cartItem: {
     marginBottom: 12,
     padding: 12,

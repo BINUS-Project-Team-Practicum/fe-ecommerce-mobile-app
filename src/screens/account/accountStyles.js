@@ -63,11 +63,13 @@ const localStyles = StyleSheet.create({
     alignItems: 'flex-start',
   },
   trackDot: {
-    height: 12,
-    width: 12,
-    borderRadius: 6,
+    height: 26,
+    width: 26,
+    borderRadius: 13,
     backgroundColor: '#D1D5DB',
-    marginTop: 4,
+    marginTop: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   trackDotActive: { backgroundColor: colors.primary },
   payment: {

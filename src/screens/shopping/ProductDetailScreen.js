@@ -72,21 +72,25 @@ export default function ProductDetailScreen({
           accessibilityLabel="Open cart"
           onPress={() => navigate('cart')}
         />
-        <Button
-          label="Add to cart"
-          variant="outline"
-          onPress={() => {
-            addToCart();
-            setShowCartFeedback(true);
-          }}
-        />
-        <Button
-          label="Buy now"
-          onPress={() => {
-            addToCart();
-            navigate('checkout');
-          }}
-        />
+        <View style={styles.ctaButton}>
+          <Button
+            label="Add to cart"
+            variant="outline"
+            onPress={() => {
+              addToCart();
+              setShowCartFeedback(true);
+            }}
+          />
+        </View>
+        <View style={styles.ctaButton}>
+          <Button
+            label="Buy now"
+            onPress={() => {
+              addToCart();
+              navigate('checkout');
+            }}
+          />
+        </View>
       </View>
       <Toast visible={showCartFeedback} message="Added to cart" />
     </View>

@@ -102,7 +102,7 @@ export function AccountUtilityScreen({
             <View key={x} style={styles.notification}>
               <View style={styles.notificationIcon}>
                 <Icon
-                  name={i === 1 ? 'cube-outline' : 'ticket-outline'}
+                  name={i === 1 ? 'car-outline' : i === 2 ? 'flash-outline' : 'ticket-outline'}
                   size={19}
                   color="#10B981"
                 />
@@ -126,13 +126,26 @@ export function AccountUtilityScreen({
       <ScrollView contentContainerStyle={styles.scroll}>
         <Header title="Lacak Pesanan" onBack={() => navigate('home')} />
         <View style={styles.trackingCard}>
-          <Text style={styles.label}>Pesanan {orders?.[0]?.id || '#MRA-240821'}</Text>
-          <Text style={styles.trackingStatus}>Dalam perjalanan</Text>
+          <View className="flex-row items-center gap-3">
+            <View className="h-11 w-11 items-center justify-center rounded-2xl bg-emerald-600">
+              <Icon name="car-outline" size={24} color="#FFFFFF" />
+            </View>
+            <View className="flex-1">
+              <Text style={styles.label}>Pesanan {orders?.[0]?.id || '#MRA-240821'}</Text>
+              <Text style={styles.trackingStatus}>Dalam perjalanan</Text>
+            </View>
+          </View>
           <Text style={styles.description}>Paket sedang diantar menuju alamat Anda.</Text>
         </View>
-        {['Pesanan dikonfirmasi', 'Paket diserahkan ke kurir', 'Dalam perjalanan'].map((x, i) => (
+        {[
+          ['checkmark-circle-outline', 'Pesanan dikonfirmasi'],
+          ['cube-outline', 'Paket diserahkan ke kurir'],
+          ['car-outline', 'Dalam perjalanan'],
+        ].map(([icon, x], i) => (
           <View key={x} style={styles.track}>
-            <View style={[styles.trackDot, i === 2 && styles.trackDotActive]} />
+            <View style={[styles.trackDot, i === 2 && styles.trackDotActive]}>
+              <Icon name={icon} size={13} color={i === 2 ? '#FFFFFF' : '#6B7280'} />
+            </View>
             <View>
               <Text style={styles.infoTitle}>{x}</Text>
               <Text style={styles.storeInfo}>{i === 2 ? 'Hari ini, 09:42' : 'Kemarin, 16:20'}</Text>
@@ -230,7 +243,10 @@ function OrderHistory({ orders, navigate }) {
       {orders.map((order) => (
         <Pressable key={order.id} onPress={() => navigate('tracking')} style={styles.checkoutCard}>
           <View style={styles.summary}>
-            <Text style={styles.label}>{order.id}</Text>
+            <View className="flex-row items-center gap-2">
+              <Icon name="receipt-outline" size={18} color="#10B981" />
+              <Text style={styles.label}>{order.id}</Text>
+            </View>
             <Text style={styles.action}>{order.status}</Text>
           </View>
           <Text style={styles.description}>
@@ -247,7 +263,7 @@ function Store({ products, navigate }) {
     <ScrollView contentContainerStyle={styles.scroll}>
       <View style={styles.storeHero}>
         <View style={styles.storeAvatar}>
-          <Text>A</Text>
+          <Icon name="storefront-outline" size={24} color="#047857" />
         </View>
         <Text style={styles.profileName}>Aster Official Store</Text>
         <Text style={styles.storeInfo}>Rating 4.9 · 12,3 rb pengikut · Online</Text>

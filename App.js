@@ -69,7 +69,6 @@ export default function App() {
         setCart(restoreCart(savedCart));
         setWishlist(savedWishlist || []);
         setOrders(savedOrders || []);
-        if (savedUser) setStage('app');
       } catch {
         // Continue with a fresh session if local storage is unavailable or invalid.
       } finally {
