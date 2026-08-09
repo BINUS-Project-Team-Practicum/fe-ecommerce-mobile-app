@@ -1,7 +1,7 @@
 {
   "expo": {
     "name": "Binus Marketplace",
-    "slug": "binus-marketplace",
+    "slug": "ecommerce-marketplace",
     "scheme": "binus-marketplace",
     "icon": "./src/public/binus-marketplace-app-icon.png",
     "version": "1.0.0",
