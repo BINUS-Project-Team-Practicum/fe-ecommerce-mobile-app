@@ -1,6 +1,5 @@
 import { useEffect, useState } from 'react';
 import { ImageBackground, Pressable, ScrollView, Text, TextInput, View } from 'react-native';
-import { categories as fallbackCategories } from '../../data/mockData';
 import { getProducts } from '../../api/client';
 import {
   Button,
@@ -41,6 +40,8 @@ export function BottomNav({ page, onNavigate }) {
 
 export function HomeScreen({
   categories: remoteCategories,
+  catalogError,
+  catalogStatus,
   products,
   cart,
   wishlist,
@@ -75,6 +76,18 @@ export function HomeScreen({
         <Icon name="search-outline" size={20} color="#98A2B3" />
         <Text style={styles.referenceSearchText}>Search products, brands, or stores</Text>
       </Pressable>
+      {catalogStatus !== 'ready' ? (
+        <View style={styles.infoBanner}>
+          <Text style={styles.infoBannerTitle}>
+            {catalogStatus === 'loading' ? 'Memuat produk…' : 'Produk belum dapat dimuat'}
+          </Text>
+          <Text style={styles.infoBannerText}>
+            {catalogStatus === 'loading'
+              ? 'Menghubungkan ke katalog Binus Marketplace.'
+              : catalogError || 'Periksa koneksi backend lalu coba lagi.'}
+          </Text>
+        </View>
+      ) : null}
       <ImageBackground
         imageStyle={styles.heroImage}
         source={{
@@ -378,6 +391,5 @@ export function CategoriesScreen({ categories: remoteCategories, goBack, navigat
 
 function toCategoryItems(remoteCategories = []) {
   const icons = ['phone-portrait-outline', 'shirt-outline', 'home-outline', 'basket-outline', 'sparkles-outline'];
-  const labels = remoteCategories.length ? remoteCategories : fallbackCategories.slice(1).map(([, label]) => label);
-  return labels.map((label, index) => [icons[index % icons.length], label]);
+  return remoteCategories.map((label, index) => [icons[index % icons.length], label]);
 }

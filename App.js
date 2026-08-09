@@ -10,7 +10,6 @@ import {
   SplashScreen,
 } from './src/screens/auth/MarketplaceAuthViews';
 import { AppShell } from './src/screens/shared/MarketplaceViews';
-import { demoProducts } from './src/data/mockData';
 import {
   createProduct,
   deleteProduct,
@@ -51,9 +50,9 @@ function isActiveToken(token) {
   }
 }
 
-function restoreCart(savedCart = []) {
+function restoreCart(savedCart = [], products = []) {
   return savedCart.reduce((items, savedItem) => {
-    const product = demoProducts.find(({ id }) => id === savedItem.id);
+    const product = products.find(({ id }) => id === savedItem.id);
     return product ? [...items, { ...product, quantity: savedItem.quantity }] : items;
   }, []);
 }
@@ -75,8 +74,11 @@ export default function App() {
   const [cart, setCart] = useState([]);
   const [wishlist, setWishlist] = useState([]);
   const [orders, setOrders] = useState([]);
-  const [products, setProducts] = useState(demoProducts);
+  const [products, setProducts] = useState([]);
   const [categories, setCategories] = useState([]);
+  const [catalogStatus, setCatalogStatus] = useState('loading');
+  const [catalogError, setCatalogError] = useState('');
+  const [pendingCart, setPendingCart] = useState(null);
   const [isHydrated, setIsHydrated] = useState(false);
   const [hasSavedState, setHasSavedState] = useState(false);
 
@@ -86,11 +88,31 @@ export default function App() {
   }, []);
 
   useEffect(() => {
-    getProducts()
-      .then((data) => data.length && setProducts(data))
-      .catch(() => {});
-    getCategories().then(setCategories).catch(() => {});
+    let active = true;
+    Promise.all([getProducts(), getCategories()])
+      .then(([productData, categoryData]) => {
+        if (!active) return;
+        setProducts(productData);
+        setCategories(categoryData);
+        setCatalogStatus('ready');
+      })
+      .catch((error) => {
+        if (!active) return;
+        setProducts([]);
+        setCategories([]);
+        setCatalogStatus('error');
+        setCatalogError(error.message || 'Produk tidak dapat dimuat.');
+      });
+    return () => {
+      active = false;
+    };
   }, []);
+
+  useEffect(() => {
+    if (pendingCart === null || catalogStatus !== 'ready') return;
+    setCart(restoreCart(pendingCart, products));
+    setPendingCart(null);
+  }, [catalogStatus, pendingCart, products]);
 
   useEffect(() => {
     if (!isHydrated) return undefined;
@@ -131,7 +153,7 @@ export default function App() {
             [profileData.firstName, profileData.lastName].filter(Boolean).join(' ') || savedUser.name,
           email: profileData.email || savedUser.email,
         });
-        setCart(restoreCart(savedCart));
+        setPendingCart(savedCart || []);
         setWishlist(savedWishlist || []);
         setOrders(savedOrders || []);
       } catch {
@@ -241,6 +263,8 @@ export default function App() {
           user={user}
           products={products}
           categories={categories}
+          catalogStatus={catalogStatus}
+          catalogError={catalogError}
           cart={cart}
           orders={orders}
           wishlist={wishlist}
