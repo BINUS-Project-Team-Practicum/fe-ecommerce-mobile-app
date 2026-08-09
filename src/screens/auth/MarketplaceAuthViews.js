@@ -133,6 +133,14 @@ export function AuthScreen({ onBack, onSuccess }) {
           ? 'Complete all fields and accept the terms to create an account.'
           : 'Enter your email or phone number and password to continue.',
       );
+    if (!register) {
+      const identifier = email.trim();
+      const isEmail = /^\S+@\S+\.\S+$/.test(identifier);
+      const isPhone = /^[+\d][\d\s-]{5,}$/.test(identifier);
+      if (!isEmail && !isPhone) {
+        return showNotice('Masukkan alamat email atau nomor telepon yang terdaftar.');
+      }
+    }
     try {
       const result = register
         ? await registerAccount({ firstName, lastName, email, phone, password })

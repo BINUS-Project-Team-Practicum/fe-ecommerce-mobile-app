@@ -3,6 +3,7 @@ import { Image, Pressable, ScrollView, Text, View } from 'react-native';
 import { money } from '../../data/mockData';
 import { Button, EmptyState, IconButton, Rating, Toast } from '../../components/ui';
 import { Icon } from '../../components/Icon';
+import { getProduct } from '../../api/client';
 import { styles } from './shoppingStyles';
 
 const VARIANTS = [
@@ -25,6 +26,7 @@ export default function ProductDetailScreen({
   goBack,
   navigate,
 }) {
+  const [remoteProduct, setRemoteProduct] = useState(product);
   const [variant, setVariant] = useState(VARIANTS[0][0]);
   const [quantity, setQuantity] = useState(1);
   const [activeTab, setActiveTab] = useState('description');
@@ -36,7 +38,19 @@ export default function ProductDetailScreen({
     return () => clearTimeout(timeout);
   }, [showCartFeedback]);
 
-  if (!product)
+  useEffect(() => {
+    let active = true;
+    setRemoteProduct(product);
+    if (!product?.id) return undefined;
+    getProduct(product.id)
+      .then((data) => active && setRemoteProduct(data))
+      .catch(() => {});
+    return () => {
+      active = false;
+    };
+  }, [product]);
+
+  if (!remoteProduct)
     return (
       <EmptyState
         title="Product not found"
@@ -46,8 +60,10 @@ export default function ProductDetailScreen({
       />
     );
 
-  const addToCart = () => Array.from({ length: quantity }).forEach(() => onAddToCart(product));
-  const isWishlisted = wishlist.includes(product.id);
+  const displayProduct = remoteProduct;
+  const addToCart = () =>
+    Array.from({ length: quantity }).forEach(() => onAddToCart(displayProduct));
+  const isWishlisted = wishlist.includes(displayProduct.id);
 
   return (
     <View style={styles.page}>
@@ -55,15 +71,15 @@ export default function ProductDetailScreen({
         <DetailHeader
           isWishlisted={isWishlisted}
           onBack={goBack}
-          onWishlist={() => onToggleWishlist(product.id)}
+          onWishlist={() => onToggleWishlist(displayProduct.id)}
         />
-        <ProductGallery product={product} />
+        <ProductGallery product={displayProduct} />
         <View style={styles.detailBody}>
-          <ProductOverview product={product} />
+          <ProductOverview product={displayProduct} />
           <VariantSelector value={variant} onChange={setVariant} />
           <QuantityControl quantity={quantity} onChange={setQuantity} />
           <ProductBenefits />
-          <ProductTabs activeTab={activeTab} onChange={setActiveTab} product={product} />
+          <ProductTabs activeTab={activeTab} onChange={setActiveTab} product={displayProduct} />
         </View>
       </ScrollView>
       <View style={styles.stickyCta}>

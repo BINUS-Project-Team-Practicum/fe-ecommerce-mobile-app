@@ -11,7 +11,15 @@ import {
 } from './src/screens/auth/MarketplaceAuthViews';
 import { AppShell } from './src/screens/shared/MarketplaceViews';
 import { demoProducts } from './src/data/mockData';
-import { getProducts } from './src/api/client';
+import {
+  createProduct,
+  deleteProduct,
+  getCategories,
+  getCurrentUser,
+  getProducts,
+  updateProduct,
+  updateProductStock,
+} from './src/api/client';
 
 const STORAGE_KEY = 'binus-marketplace-state';
 const BASE64_ALPHABET = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/';
@@ -68,6 +76,7 @@ export default function App() {
   const [wishlist, setWishlist] = useState([]);
   const [orders, setOrders] = useState([]);
   const [products, setProducts] = useState(demoProducts);
+  const [categories, setCategories] = useState([]);
   const [isHydrated, setIsHydrated] = useState(false);
   const [hasSavedState, setHasSavedState] = useState(false);
 
@@ -80,6 +89,7 @@ export default function App() {
     getProducts()
       .then((data) => data.length && setProducts(data))
       .catch(() => {});
+    getCategories().then(setCategories).catch(() => {});
   }, []);
 
   useEffect(() => {
@@ -112,7 +122,15 @@ export default function App() {
           return;
         }
 
-        setUser(savedUser);
+        const profile = await getCurrentUser(savedUser.token);
+        if (!isMounted) return;
+        const profileData = profile.data;
+        setUser({
+          ...savedUser,
+          name:
+            [profileData.firstName, profileData.lastName].filter(Boolean).join(' ') || savedUser.name,
+          email: profileData.email || savedUser.email,
+        });
         setCart(restoreCart(savedCart));
         setWishlist(savedWishlist || []);
         setOrders(savedOrders || []);
@@ -149,8 +167,26 @@ export default function App() {
         ? items.filter((item) => item.id !== id)
         : items.map((item) => (item.id === id ? { ...item, quantity } : item)),
     );
-  const completeOrder = () => {
-    if (!cart.length) return;
+  const createCatalogProduct = async (payload) => {
+    const product = await createProduct(payload);
+    setProducts((items) => [product, ...items]);
+    setCategories((items) => (items.includes(product.category) ? items : [...items, product.category]));
+    return product;
+  };
+  const updateCatalogProduct = async (id, payload) => {
+    const product = await updateProduct(id, payload);
+    setProducts((items) => items.map((item) => (item.id === id ? product : item)));
+    return product;
+  };
+  const deleteCatalogProduct = async (id) => {
+    await deleteProduct(id);
+    setProducts((items) => items.filter((item) => item.id !== id));
+  };
+  const completeOrder = async () => {
+    if (!cart.length) return false;
+    await Promise.all(
+      cart.map((item) => updateProductStock(item.id, Math.max(0, Number(item.stock || 0) - item.quantity))),
+    );
     const total = cart.reduce((sum, item) => sum + item.price * item.quantity, 0);
     setOrders((items) => [
       {
@@ -162,6 +198,15 @@ export default function App() {
       ...items,
     ]);
     setCart([]);
+    setProducts((items) =>
+      items.map((product) => {
+        const ordered = cart.find((item) => item.id === product.id);
+        return ordered
+          ? { ...product, stock: Math.max(0, Number(product.stock || 0) - ordered.quantity) }
+          : product;
+      }),
+    );
+    return true;
   };
   const continueFromOnboarding = () => setStage(user ? 'app' : 'auth');
   const logout = async () => {
@@ -195,6 +240,7 @@ export default function App() {
         <AppShell
           user={user}
           products={products}
+          categories={categories}
           cart={cart}
           orders={orders}
           wishlist={wishlist}
@@ -203,6 +249,14 @@ export default function App() {
           onAddToCart={addToCart}
           onUpdateQuantity={updateQuantity}
           onCompleteOrder={completeOrder}
+          onCreateProduct={createCatalogProduct}
+          onUpdateProduct={updateCatalogProduct}
+          onDeleteProduct={deleteCatalogProduct}
+          onUpdateProductStock={async (id, stock) => {
+            const product = await updateProductStock(id, stock);
+            setProducts((items) => items.map((item) => (item.id === id ? product : item)));
+            return product;
+          }}
           onToggleWishlist={(id) =>
             setWishlist((items) =>
               items.includes(id) ? items.filter((item) => item !== id) : [...items, id],

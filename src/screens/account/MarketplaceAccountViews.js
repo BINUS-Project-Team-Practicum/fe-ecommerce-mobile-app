@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Alert, Pressable, ScrollView, Switch, Text, View } from 'react-native';
+import { Alert, Pressable, ScrollView, Switch, Text, TextInput, View } from 'react-native';
 import { EmptyState, Button, SectionTitle } from '../../components/ui';
 import { Icon } from '../../components/Icon';
 import { Header, MenuGroup, ProductGrid } from '../shared/MarketplaceComponents';
@@ -32,6 +32,10 @@ export function AccountUtilityScreen({
   navigate,
   onLogin,
   onLogout,
+  onCreateProduct,
+  onUpdateProduct,
+  onDeleteProduct,
+  onUpdateProductStock,
 }) {
   if (page === 'wishlist') {
     const list = products.filter((p) => wishlist.includes(p.id));
@@ -180,9 +184,13 @@ export function AccountUtilityScreen({
         ].map((x, i) => (
           <Pressable
             key={x}
-            onPress={() => {
-              onCompleteOrder?.();
-              navigate('success');
+            onPress={async () => {
+              try {
+                const completed = await onCompleteOrder?.();
+                if (completed) navigate('success');
+              } catch (error) {
+                Alert.alert('Pesanan belum diproses', error.message || 'Stok produk tidak dapat diperbarui.');
+              }
             }}
             style={styles.payment}
           >
@@ -221,6 +229,15 @@ export function AccountUtilityScreen({
         />
       ) : page === 'store' ? (
         <Store products={products} navigate={navigate} />
+      ) : page === 'manageProducts' ? (
+        <ProductManager
+          products={products}
+          goBack={goBack}
+          onCreateProduct={onCreateProduct}
+          onUpdateProduct={onUpdateProduct}
+          onDeleteProduct={onDeleteProduct}
+          onUpdateProductStock={onUpdateProductStock}
+        />
       ) : page === 'settings' ? (
         <SettingsScreen navigate={navigate} />
       ) : (
@@ -287,6 +304,7 @@ function Store({ products, navigate }) {
           variant="outline"
           onPress={() => Alert.alert('Berhasil', 'Toko telah diikuti.')}
         />
+        <Button label="Kelola produk" small onPress={() => navigate('manageProducts')} />
       </View>
       <SectionTitle title="Produk toko" />
       <ProductGrid
@@ -295,6 +313,101 @@ function Store({ products, navigate }) {
         onWishlist={() => {}}
         onPress={(p) => navigate('detail', p)}
       />
+    </ScrollView>
+  );
+}
+
+const EMPTY_PRODUCT = {
+  name: '',
+  storeName: 'Binus Official Store',
+  description: '',
+  price: '',
+  category: '',
+  stock: '',
+  images: '',
+};
+
+function ProductManager({
+  products,
+  goBack,
+  onCreateProduct,
+  onUpdateProduct,
+  onDeleteProduct,
+  onUpdateProductStock,
+}) {
+  const [editing, setEditing] = useState(null);
+  const [form, setForm] = useState(EMPTY_PRODUCT);
+  const [saving, setSaving] = useState(false);
+  const edit = (product) => {
+    setEditing(product);
+    setForm({
+      name: product.name,
+      storeName: product.store,
+      description: product.description,
+      price: String(product.price),
+      category: product.category,
+      stock: String(product.stock),
+      images: product.images?.join(', ') || product.image || '',
+    });
+  };
+  const save = async () => {
+    const payload = {
+      ...form,
+      price: Number(form.price),
+      stock: Number(form.stock),
+      images: form.images.split(',').map((image) => image.trim()).filter(Boolean),
+    };
+    try {
+      setSaving(true);
+      if (editing) await onUpdateProduct(editing.id, payload);
+      else await onCreateProduct(payload);
+      setEditing(null);
+      setForm(EMPTY_PRODUCT);
+      Alert.alert('Berhasil', editing ? 'Produk diperbarui.' : 'Produk ditambahkan.');
+    } catch (error) {
+      Alert.alert('Gagal menyimpan', error.message || 'Periksa data produk.');
+    } finally {
+      setSaving(false);
+    }
+  };
+  const remove = (product) =>
+    Alert.alert('Hapus produk?', product.name, [
+      { text: 'Batal', style: 'cancel' },
+      {
+        text: 'Hapus',
+        style: 'destructive',
+        onPress: () => onDeleteProduct(product.id).catch((error) => Alert.alert('Gagal', error.message)),
+      },
+    ]);
+
+  return (
+    <ScrollView contentContainerStyle={styles.scroll}>
+      <Header title="Kelola Produk" onBack={goBack} />
+      <Text style={styles.description}>Alat pengelolaan katalog (development).</Text>
+      {Object.entries(form).map(([key, value]) => (
+        <TextInput
+          key={key}
+          value={value}
+          onChangeText={(next) => setForm((current) => ({ ...current, [key]: next }))}
+          placeholder={key === 'images' ? 'Image URL' : key}
+          multiline={key === 'description'}
+          style={[styles.payment, { paddingHorizontal: 14, color: '#111827' }]}
+        />
+      ))}
+      <Button label={saving ? 'Menyimpan…' : editing ? 'Simpan perubahan' : 'Tambah produk'} onPress={save} disabled={saving} />
+      <Button label="Batal edit" variant="outline" small onPress={() => { setEditing(null); setForm(EMPTY_PRODUCT); }} />
+      <SectionTitle title="Produk backend" />
+      {products.map((product) => (
+        <View key={product.id} style={styles.checkoutCard}>
+          <Text style={styles.infoTitle}>{product.name}</Text>
+          <Text style={styles.storeInfo}>Stok: {product.stock}</Text>
+          <View style={{ flexDirection: 'row', gap: 8 }}>
+            <Button label="Ubah" small variant="outline" onPress={() => edit(product)} />
+            <Button label="Stok +1" small variant="outline" onPress={() => onUpdateProductStock(product.id, Number(product.stock) + 1).catch((error) => Alert.alert('Gagal', error.message))} />
+            <Button label="Hapus" small variant="outline" onPress={() => remove(product)} />
+          </View>
+        </View>
+      ))}
     </ScrollView>
   );
 }

@@ -1,5 +1,7 @@
+import { useEffect, useState } from 'react';
 import { ImageBackground, Pressable, ScrollView, Text, TextInput, View } from 'react-native';
-import { categories } from '../../data/mockData';
+import { categories as fallbackCategories } from '../../data/mockData';
+import { getProducts } from '../../api/client';
 import {
   Button,
   Badge,
@@ -38,6 +40,7 @@ export function BottomNav({ page, onNavigate }) {
 }
 
 export function HomeScreen({
+  categories: remoteCategories,
   products,
   cart,
   wishlist,
@@ -46,6 +49,7 @@ export function HomeScreen({
   onLogin,
   navigate,
 }) {
+  const categoryItems = toCategoryItems(remoteCategories);
   const cartItemCount = cart.reduce((total, item) => total + item.quantity, 0);
   const openCategory = (category) => navigate('search', null, category);
   const openAllProducts = () => navigate('search', null, '');
@@ -116,7 +120,7 @@ export function HomeScreen({
         </Pressable>
       </View>
       <View style={styles.categoryGrid}>
-        {categories.slice(1, 5).map(([icon, label]) => (
+        {categoryItems.slice(0, 4).map(([icon, label]) => (
           <Pressable
             key={label}
             onPress={() => openCategory(label)}
@@ -230,6 +234,7 @@ export function HomeScreen({
 }
 
 export function SearchScreen({
+  categories: remoteCategories,
   products,
   wishlist,
   onToggleWishlist,
@@ -238,12 +243,22 @@ export function SearchScreen({
   query,
   setQuery,
 }) {
-  const filtered = products.filter(
-    (p) =>
-      p.name.toLowerCase().includes(query.toLowerCase()) ||
-      p.store.toLowerCase().includes(query.toLowerCase()) ||
-      p.category?.toLowerCase() === query.toLowerCase(),
-  );
+  const [remoteProducts, setRemoteProducts] = useState(products);
+  const categoryItems = toCategoryItems(remoteCategories);
+  const selectedCategory = remoteCategories?.includes(query) ? query : '';
+  const search = selectedCategory ? '' : query;
+
+  useEffect(() => {
+    let active = true;
+    getProducts({ category: selectedCategory, search })
+      .then((data) => active && setRemoteProducts(data))
+      .catch(() => active && setRemoteProducts(products));
+    return () => {
+      active = false;
+    };
+  }, [products, search, selectedCategory]);
+
+  const filtered = remoteProducts;
   const recentSearches = ['wireless headphones', 'running shoes', 'minimal watch', 'coffee maker'];
   const trending = ['Air Max', 'Smart Watch', 'Noise Cancelling', 'Leather Bag'];
   return (
@@ -266,11 +281,10 @@ export function SearchScreen({
         style={styles.searchCategoriesContainer}
         contentContainerStyle={styles.searchCategories}
       >
-        <Chip label="All" active />
-        <Chip label="Electronics" />
-        <Chip label="Fashion" />
-        <Chip label="Home" />
-        <Chip label="Sports" />
+        <Chip label="All" active={!selectedCategory} onPress={() => setQuery('')} />
+        {categoryItems.map(([, label]) => (
+          <Chip key={label} label={label} active={selectedCategory === label} onPress={() => setQuery(label)} />
+        ))}
       </ScrollView>
       <ScrollView contentContainerStyle={styles.searchResults}>
         {!query && (
@@ -329,15 +343,16 @@ function TextInputProxy({ value, onChange }) {
   );
 }
 
-export function CategoriesScreen({ goBack, navigate }) {
+export function CategoriesScreen({ categories: remoteCategories, goBack, navigate }) {
+  const categoryItems = toCategoryItems(remoteCategories);
   return (
     <ScrollView contentContainerStyle={styles.scroll}>
       <Header title="Kategori" onBack={goBack} />
       <Text style={styles.resultCount}>Pilih kategori yang ingin kamu jelajahi</Text>
       <View style={styles.fullCategoryGrid}>
-        {categories.concat(categories.slice(1, 5)).map(([icon, label], index) => (
+        {categoryItems.map(([icon, label]) => (
           <Pressable
-            key={`${label}${index}`}
+            key={label}
             onPress={() => navigate('search', null, label)}
             style={styles.fullCategory}
           >
@@ -359,4 +374,10 @@ export function CategoriesScreen({ goBack, navigate }) {
       </View>
     </ScrollView>
   );
+}
+
+function toCategoryItems(remoteCategories = []) {
+  const icons = ['phone-portrait-outline', 'shirt-outline', 'home-outline', 'basket-outline', 'sparkles-outline'];
+  const labels = remoteCategories.length ? remoteCategories : fallbackCategories.slice(1).map(([, label]) => label);
+  return labels.map((label, index) => [icons[index % icons.length], label]);
 }
