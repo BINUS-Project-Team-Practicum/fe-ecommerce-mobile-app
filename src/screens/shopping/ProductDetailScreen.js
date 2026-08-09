@@ -145,16 +145,19 @@ function ProductGallery({ product }) {
 }
 
 function ProductOverview({ product }) {
+  const discount = Number(product.discount) || 0;
+  const hasDiscount = discount > 0 && Number(product.oldPrice) > Number(product.price);
   return (
     <>
       <Text style={styles.detailStore}>
-        {product.store} <Text style={styles.detailOfficial}>· {product.badge}</Text>
+        {product.store || 'Marketplace store'}
+        {product.badge ? <Text style={styles.detailOfficial}> · {product.badge}</Text> : null}
       </Text>
       <Text style={styles.detailName}>{product.name}</Text>
       <View style={styles.detailPriceRow}>
         <Text style={styles.detailPrice}>{money(product.price)}</Text>
-        <Text style={styles.detailOldPrice}>{money(product.oldPrice)}</Text>
-        <Text style={styles.detailDiscount}>-{product.discount}%</Text>
+        {hasDiscount ? <Text style={styles.detailOldPrice}>{money(product.oldPrice)}</Text> : null}
+        {hasDiscount ? <Text style={styles.detailDiscount}>-{discount}%</Text> : null}
       </View>
       <View style={styles.detailMeta}>
         <Icon name="star" size={14} color="#F59E0B" />

@@ -30,6 +30,7 @@ export function AccountUtilityScreen({
   onCompleteOrder,
   navigate,
   onLogin,
+  onLogout,
 }) {
   if (page === 'wishlist') {
     const list = products.filter((p) => wishlist.includes(p.id));
@@ -70,8 +71,16 @@ export function AccountUtilityScreen({
               {user?.email || 'Masuk untuk menikmati semua fitur'}
             </Text>
           </View>
-          <Pressable onPress={onLogin}>
-            <Text style={styles.action}>{user ? 'Edit' : 'Masuk'}</Text>
+          <Pressable
+            onPress={() => {
+              if (!user) return onLogin?.();
+              Alert.alert('Keluar dari akun?', 'Anda perlu login kembali untuk mengakses akun ini.', [
+                { text: 'Batal', style: 'cancel' },
+                { text: 'Keluar', style: 'destructive', onPress: onLogout },
+              ]);
+            }}
+          >
+            <Text style={styles.action}>{user ? 'Keluar' : 'Masuk'}</Text>
           </Pressable>
         </View>
         <MenuGroup

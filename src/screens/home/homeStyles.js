@@ -268,8 +268,10 @@ const localStyles = StyleSheet.create({
     borderBottomWidth: 1,
     borderColor: '#EAECF0',
     height: 52,
+    flexGrow: 0,
+    flexShrink: 0,
   },
-  searchCategories: { paddingHorizontal: 16, alignItems: 'center' },
+  searchCategories: { paddingHorizontal: 16, alignItems: 'center', gap: 2 },
   searchGroupTitle: {
     fontFamily: sans,
     color: '#98A2B3',
@@ -323,7 +325,13 @@ const localStyles = StyleSheet.create({
     fontWeight: '700',
     fontSize: 13,
   },
-  resultCount: { color: colors.muted, fontSize: 12, marginBottom: 12 },
+  searchResults: {
+    flexGrow: 1,
+    padding: 16,
+    paddingBottom: 104,
+    backgroundColor: colors.background,
+  },
+  resultCount: { color: colors.muted, fontSize: 13, fontWeight: '600', marginBottom: 16 },
   fullCategoryGrid: {
     flexDirection: 'row',
     flexWrap: 'wrap',

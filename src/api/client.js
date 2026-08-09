@@ -23,9 +23,35 @@ export async function request(path, options = {}) {
 }
 
 export function getProducts() {
-  return request('/products');
+  return request('/products').then(({ data = [] }) => data.map(normalizeProduct));
 }
 
-export function login(credentials) {
-  return request('/auth/login', { method: 'POST', body: JSON.stringify(credentials) });
+export function login({ identifier, password }) {
+  return request('/users/login', {
+    method: 'POST',
+    body: JSON.stringify({ identifier, password }),
+  });
+}
+
+export function register(account) {
+  return request('/users/register', { method: 'POST', body: JSON.stringify(account) });
+}
+
+function normalizeProduct(product) {
+  return {
+    id: product._id,
+    name: product.name,
+    category: product.category,
+    price: product.price,
+    oldPrice: product.price,
+    rating: product.rating || 0,
+    sold: product.sold ? String(product.sold) : 'New',
+    discount: product.discount || 0,
+    image: product.images?.[0],
+    store: product.storeName,
+    location: product.location || 'Indonesia',
+    badge: product.badge || 'Store',
+    description: product.description,
+    stock: product.stock,
+  };
 }

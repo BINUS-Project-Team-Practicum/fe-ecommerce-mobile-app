@@ -11,6 +11,7 @@ import {
 } from './src/screens/auth/MarketplaceAuthViews';
 import { AppShell } from './src/screens/shared/MarketplaceViews';
 import { demoProducts } from './src/data/mockData';
+import { getProducts } from './src/api/client';
 
 const STORAGE_KEY = 'mora-marketplace-state';
 
@@ -38,11 +39,18 @@ export default function App() {
   const [cart, setCart] = useState([]);
   const [wishlist, setWishlist] = useState([]);
   const [orders, setOrders] = useState([]);
+  const [products, setProducts] = useState(demoProducts);
   const [isHydrated, setIsHydrated] = useState(false);
 
   useEffect(() => {
     const timer = setTimeout(() => setFontLoadTimedOut(true), 2500);
     return () => clearTimeout(timer);
+  }, []);
+
+  useEffect(() => {
+    getProducts()
+      .then((data) => data.length && setProducts(data))
+      .catch(() => {});
   }, []);
 
   useEffect(() => {
@@ -116,6 +124,15 @@ export default function App() {
     ]);
     setCart([]);
   };
+  const continueFromOnboarding = () => setStage(user ? 'app' : 'auth');
+  const logout = async () => {
+    setUser(null);
+    setCart([]);
+    setWishlist([]);
+    setOrders([]);
+    setStage('auth');
+    await SecureStore.deleteItemAsync(STORAGE_KEY).catch(() => {});
+  };
 
   if (!iconsLoaded && !iconLoadError && !fontLoadTimedOut) return <SplashScreen />;
 
@@ -124,7 +141,7 @@ export default function App() {
       <StatusBar barStyle="dark-content" />
       {stage === 'splash' && <SplashScreen />}
       {stage === 'onboarding' && (
-        <OnboardingScreen onDone={() => setStage('auth')} onSkip={() => setStage('app')} />
+        <OnboardingScreen onDone={continueFromOnboarding} onSkip={continueFromOnboarding} />
       )}
       {stage === 'auth' && (
         <AuthScreen
@@ -138,11 +155,12 @@ export default function App() {
       {stage === 'app' && (
         <AppShell
           user={user}
-          products={demoProducts}
+          products={products}
           cart={cart}
           orders={orders}
           wishlist={wishlist}
           onLogin={() => setStage('auth')}
+          onLogout={logout}
           onAddToCart={addToCart}
           onUpdateQuantity={updateQuantity}
           onCompleteOrder={completeOrder}

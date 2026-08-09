@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
-import { Animated, View } from 'react-native';
+import { Animated, Platform, View } from 'react-native';
 import { colors } from '../../components/ui';
 import {
   BottomNav,
@@ -13,6 +13,8 @@ import OrderSuccessScreen from '../shopping/OrderSuccessScreen';
 import ProductDetailScreen from '../shopping/ProductDetailScreen';
 import { AccountUtilityScreen } from '../account/MarketplaceAccountViews';
 
+const supportsNativeDriver = Platform.OS !== 'web';
+
 export function AppShell(props) {
   const [page, setPage] = useState('home');
   const [selected, setSelected] = useState(null);
@@ -23,8 +25,16 @@ export function AppShell(props) {
     opacity.setValue(0);
     translateY.setValue(10);
     Animated.parallel([
-      Animated.timing(opacity, { toValue: 1, duration: 180, useNativeDriver: true }),
-      Animated.timing(translateY, { toValue: 0, duration: 180, useNativeDriver: true }),
+      Animated.timing(opacity, {
+        toValue: 1,
+        duration: 180,
+        useNativeDriver: supportsNativeDriver,
+      }),
+      Animated.timing(translateY, {
+        toValue: 0,
+        duration: 180,
+        useNativeDriver: supportsNativeDriver,
+      }),
     ]).start();
   }, [opacity, page, translateY]);
   const navigate = (to, product) => {

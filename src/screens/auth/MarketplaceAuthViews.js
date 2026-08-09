@@ -1,8 +1,9 @@
-import { useState } from 'react';
-import { Alert, Pressable, ScrollView, Text, TextInput, View } from 'react-native';
-import { Button } from '../../components/ui';
+import { useEffect, useState } from 'react';
+import { Pressable, ScrollView, Text, TextInput, View } from 'react-native';
+import { Button, Toast } from '../../components/ui';
 import { Icon } from '../../components/Icon';
 import { styles } from './authStyles';
+import { login, register as registerAccount } from '../../api/client';
 
 export function SplashScreen() {
   return (
@@ -67,148 +68,176 @@ export function AuthScreen({ onBack, onSuccess }) {
   const [phone, setPhone] = useState('');
   const [agreed, setAgreed] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
-  const submit = () => {
+  const [notice, setNotice] = useState('');
+  const showNotice = (message) => {
+    setNotice(message);
+  };
+
+  useEffect(() => {
+    if (!notice) return undefined;
+    const timeout = setTimeout(() => setNotice(''), 3200);
+    return () => clearTimeout(timeout);
+  }, [notice]);
+
+  const submit = async () => {
     if (!email || !password || (register && (!firstName || !lastName || !phone || !agreed)))
-      return Alert.alert(
-        'Lengkapi data',
+      return showNotice(
         register
-          ? 'Isi seluruh data dan setujui ketentuan.'
-          : 'Masukkan email dan password untuk melanjutkan.',
+          ? 'Complete all fields and accept the terms to create an account.'
+          : 'Enter your email or phone number and password to continue.',
       );
-    onSuccess({
-      name: register ? `${firstName} ${lastName}` : email.split('@')[0],
-      email,
-    });
+    try {
+      const result = register
+        ? await registerAccount({ firstName, lastName, email, phone, password })
+        : await login({ identifier: email, password });
+      onSuccess({
+        id: result.data.id,
+        name: register ? `${firstName} ${lastName}` : result.data.email.split('@')[0],
+        email: result.data.email,
+        token: result.token,
+      });
+    } catch (error) {
+      showNotice(error.message || 'We could not complete your request. Please try again.');
+    }
   };
   return (
-    <ScrollView
-      style={styles.authPage}
-      contentContainerStyle={[styles.referenceAuth, !register && styles.loginAuth]}
-      keyboardShouldPersistTaps="handled"
-      scrollEnabled={register}
-    >
-      <View
-        style={[
-          styles.authHero,
-          !register && styles.loginAuthHero,
-          register && styles.registerHero,
-        ]}
+    <View style={styles.authPage}>
+      <ScrollView
+        style={styles.authPage}
+        contentContainerStyle={[styles.referenceAuth, !register && styles.loginAuth]}
+        keyboardShouldPersistTaps="handled"
+        scrollEnabled={register}
       >
-        {register && (
-          <Pressable onPress={onBack} hitSlop={12}>
-            <Icon name="chevron-back" size={30} color="#fff" />
-          </Pressable>
-        )}
-        <View style={styles.authStoreIcon}>
-          <Icon name="storefront-outline" size={36} color="#fff" />
+        <View
+          style={[
+            styles.authHero,
+            !register && styles.loginAuthHero,
+            register && styles.registerHero,
+          ]}
+        >
+          {register && (
+            <Pressable onPress={onBack} hitSlop={12}>
+              <Icon name="chevron-back" size={30} color="#fff" />
+            </Pressable>
+          )}
+          <View style={styles.authStoreIcon}>
+            <Icon name="storefront-outline" size={36} color="#fff" />
+          </View>
+          <Text style={[styles.authHeroTitle, !register && styles.loginAuthHeroTitle]}>
+            {register ? 'Create account' : 'Welcome back'}
+          </Text>
+          <Text style={[styles.authHeroCopy, !register && styles.loginAuthHeroCopy]}>
+            {register ? 'Join millions of happy shoppers' : 'Sign in to continue shopping'}
+          </Text>
         </View>
-        <Text style={[styles.authHeroTitle, !register && styles.loginAuthHeroTitle]}>
-          {register ? 'Create account' : 'Welcome back'}
-        </Text>
-        <Text style={[styles.authHeroCopy, !register && styles.loginAuthHeroCopy]}>
-          {register ? 'Join millions of happy shoppers' : 'Sign in to continue shopping'}
-        </Text>
-      </View>
-      <View style={[styles.authPanel, !register && styles.loginAuthPanel]}>
-        {register ? (
-          <>
-            <View style={styles.nameRow}>
+        <View style={[styles.authPanel, !register && styles.loginAuthPanel]}>
+          {register ? (
+            <>
+              <View style={styles.nameRow}>
+                <ReferenceInput
+                  label="FIRST NAME"
+                  value={firstName}
+                  onChangeText={setFirstName}
+                  placeholder="First Name"
+                  compact
+                />
+                <ReferenceInput
+                  label="LAST NAME"
+                  value={lastName}
+                  onChangeText={setLastName}
+                  placeholder="Last Name"
+                  compact
+                />
+              </View>
               <ReferenceInput
-                label="FIRST NAME"
-                value={firstName}
-                onChangeText={setFirstName}
-                placeholder="First Name"
-                compact
+                label="EMAIL ADDRESS"
+                value={email}
+                onChangeText={setEmail}
+                placeholder="Enter email address"
+                keyboardType="email-address"
+                autoCapitalize="none"
+                autoCorrect={false}
               />
               <ReferenceInput
-                label="LAST NAME"
-                value={lastName}
-                onChangeText={setLastName}
-                placeholder="Last Name"
-                compact
+                label="PHONE NUMBER"
+                value={phone}
+                onChangeText={setPhone}
+                placeholder="Enter phone number"
+                keyboardType="phone-pad"
               />
-            </View>
+            </>
+          ) : (
             <ReferenceInput
-              label="EMAIL ADDRESS"
+              label="EMAIL OR PHONE"
               value={email}
               onChangeText={setEmail}
-              placeholder="Enter email address"
-              keyboardType="email-address"
+              placeholder="alex.johnson@email.com"
+              icon="mail-outline"
+              dense
+              autoCapitalize="none"
+              autoCorrect={false}
             />
-            <ReferenceInput
-              label="PHONE NUMBER"
-              value={phone}
-              onChangeText={setPhone}
-              placeholder="Enter phone number"
-              keyboardType="phone-pad"
-            />
-          </>
-        ) : (
+          )}
           <ReferenceInput
-            label="EMAIL OR PHONE"
-            value={email}
-            onChangeText={setEmail}
-            placeholder="alex.johnson@email.com"
-            icon="mail-outline"
-            dense
+            label="PASSWORD"
+            value={password}
+            onChangeText={setPassword}
+            placeholder={register ? 'Enter password' : '••••••••'}
+            icon="lock-closed-outline"
+            secureTextEntry={!showPassword}
+            rightIcon={showPassword ? 'eye-off-outline' : 'eye-outline'}
+            onRightIconPress={() => setShowPassword(!showPassword)}
+            dense={!register}
+            autoCapitalize="none"
+            autoCorrect={false}
           />
-        )}
-        <ReferenceInput
-          label="PASSWORD"
-          value={password}
-          onChangeText={setPassword}
-          placeholder={register ? 'Enter password' : '••••••••'}
-          icon="lock-closed-outline"
-          secureTextEntry={!showPassword}
-          rightIcon={showPassword ? 'eye-off-outline' : 'eye-outline'}
-          onRightIconPress={() => setShowPassword(!showPassword)}
-          dense={!register}
-        />
-        {!register && (
-          <Pressable>
-            <Text style={styles.forgot}>Forgot password?</Text>
-          </Pressable>
-        )}
-        {register && (
-          <Pressable onPress={() => setAgreed(!agreed)} style={styles.agreement}>
-            <View style={[styles.checkbox, agreed && styles.checkboxChecked]}>
-              {agreed ? <Icon name="checkmark" size={16} color="#fff" /> : null}
-            </View>
-            <Text style={styles.agreementText}>
-              I agree to the <Text style={styles.agreementLink}>Terms of Service</Text> and{' '}
-              <Text style={styles.agreementLink}>Privacy Policy</Text>
+          {!register && (
+            <Pressable>
+              <Text style={styles.forgot}>Forgot password?</Text>
+            </Pressable>
+          )}
+          {register && (
+            <Pressable onPress={() => setAgreed(!agreed)} style={styles.agreement}>
+              <View style={[styles.checkbox, agreed && styles.checkboxChecked]}>
+                {agreed ? <Icon name="checkmark" size={16} color="#fff" /> : null}
+              </View>
+              <Text style={styles.agreementText}>
+                I agree to the <Text style={styles.agreementLink}>Terms of Service</Text> and{' '}
+                <Text style={styles.agreementLink}>Privacy Policy</Text>
+              </Text>
+            </Pressable>
+          )}
+          <Button label={register ? 'Create Account' : 'Sign In'} onPress={submit} />
+          {!register && (
+            <>
+              <View style={styles.divider}>
+                <View style={styles.dividerLine} />
+                <Text style={styles.dividerText}>or continue with</Text>
+                <View style={styles.dividerLine} />
+              </View>
+              <View style={styles.socialRow}>
+                <SocialButton label="Google" icon="logo-google" />
+                <SocialButton label="Apple" icon="logo-apple" />
+              </View>
+            </>
+          )}
+          <Pressable onPress={() => setRegister(!register)}>
+            <Text style={styles.switchAuth}>
+              {register ? (
+                <>
+                  Already have an account? <Text style={styles.greenLink}>Sign In</Text>
+                </>
+              ) : (
+                <>
+                  Don&apos;t have an account? <Text style={styles.greenLink}>Sign Up</Text>
+                </>
+              )}
             </Text>
           </Pressable>
-        )}
-        <Button label={register ? 'Create Account' : 'Sign In'} onPress={submit} />
-        {!register && (
-          <>
-            <View style={styles.divider}>
-              <View style={styles.dividerLine} />
-              <Text style={styles.dividerText}>or continue with</Text>
-              <View style={styles.dividerLine} />
-            </View>
-            <View style={styles.socialRow}>
-              <SocialButton label="Google" icon="logo-google" />
-              <SocialButton label="Apple" icon="logo-apple" />
-            </View>
-          </>
-        )}
-        <Pressable onPress={() => setRegister(!register)}>
-          <Text style={styles.switchAuth}>
-            {register ? (
-              <>
-                Already have an account? <Text style={styles.greenLink}>Sign In</Text>
-              </>
-            ) : (
-              <>
-                Don&apos;t have an account? <Text style={styles.greenLink}>Sign Up</Text>
-              </>
-            )}
-          </Text>
-        </Pressable>
-      </View>
-    </ScrollView>
+        </View>
+      </ScrollView>
+      <Toast message={notice} visible={Boolean(notice)} tone="error" />
+    </View>
   );
 }
 function ReferenceInput({ label, compact, dense, icon, rightIcon, onRightIconPress, ...props }) {

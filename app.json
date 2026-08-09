@@ -9,9 +9,12 @@
       "resizeMode": "contain",
       "backgroundColor": "#f8fafc"
     },
-    "assetBundlePatterns": ["**/*"],
+    "assetBundlePatterns": [
+      "**/*"
+    ],
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": true,
+      "bundleIdentifier": "com.ardanimith.ecommercemarketplace"
     },
     "android": {
       "adaptiveIcon": {
@@ -22,7 +25,9 @@
     "web": {
       "bundler": "metro"
     },
-    "plugins": ["expo-asset"],
+    "plugins": [
+      "expo-asset"
+    ],
     "extra": {
       "eas": {
         "projectId": "d1262dd9-9728-4d8a-8371-8d2d66715b26"

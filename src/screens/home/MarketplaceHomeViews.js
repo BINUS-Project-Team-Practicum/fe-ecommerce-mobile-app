@@ -271,7 +271,7 @@ export function SearchScreen({ products, wishlist, onToggleWishlist, navigate, q
         <Chip label="Home" />
         <Chip label="Sports" />
       </ScrollView>
-      <ScrollView contentContainerStyle={styles.scroll}>
+      <ScrollView contentContainerStyle={styles.searchResults}>
         {!query && (
           <>
             <Text style={styles.searchGroupTitle}>RECENT SEARCHES</Text>

@@ -8,7 +8,7 @@ import {
   TextInput,
   View,
 } from 'react-native';
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { money } from '../data/mockData';
 import { Icon } from './Icon';
 
@@ -32,13 +32,14 @@ const sans = Platform.select({
 });
 
 const AnimatedPressable = Animated.createAnimatedComponent(Pressable);
+const supportsNativeDriver = Platform.OS !== 'web';
 
 function usePressScale() {
   const scale = useRef(new Animated.Value(1)).current;
   const animate = (value) =>
     Animated.spring(scale, {
       toValue: value,
-      useNativeDriver: true,
+      useNativeDriver: supportsNativeDriver,
       speed: 30,
       bounciness: 3,
     }).start();
@@ -50,30 +51,21 @@ function usePressScale() {
 
 export function Button({ label, onPress, variant = 'primary', small, disabled }) {
   const pressAnimation = usePressScale();
-  const buttonClass = [
-    'min-h-12 items-center justify-center rounded-2xl px-[18px]',
-    variant === 'primary' && 'bg-brand',
-    variant === 'secondary' && 'bg-accent',
-    variant === 'outline' && 'border border-brand bg-white',
-    small && 'min-h-9 px-3',
-    disabled && 'opacity-55',
-  ]
-    .filter(Boolean)
-    .join(' ');
   return (
     <AnimatedPressable
       accessibilityRole="button"
       disabled={disabled}
       onPress={onPress}
-      className={buttonClass}
-      style={pressAnimation.animationStyle}
+      style={[
+        styles.button,
+        styles[variant],
+        small && styles.buttonSmall,
+        disabled && styles.disabled,
+        pressAnimation.animationStyle,
+      ]}
       {...pressAnimation.handlers}
     >
-      <Text
-        className={`text-[15px] font-bold ${variant === 'outline' ? 'text-brand' : 'text-white'}`}
-      >
-        {label}
-      </Text>
+      <Text style={[styles.buttonText, variant === 'outline' && styles.outlineText]}>{label}</Text>
     </AnimatedPressable>
   );
 }
@@ -161,6 +153,9 @@ export function QuantitySelector({ quantity, onChange }) {
 }
 
 export function ProductCard({ product, onPress, wishlisted, onWishlist, style, imageStyle }) {
+  const [imageFailed, setImageFailed] = useState(false);
+  const hasImage = Boolean(product.image) && !imageFailed;
+  const discount = Number(product.discount) || 0;
   return (
     <Pressable
       accessibilityRole="button"
@@ -169,25 +164,36 @@ export function ProductCard({ product, onPress, wishlisted, onWishlist, style, i
       style={style}
     >
       <View>
-        <Image
-          source={{ uri: product.image }}
-          className="h-[146px] w-full rounded-[11px] bg-slate-200"
-          style={imageStyle}
-        />
-        <View className="absolute left-[7px] top-[7px] rounded-md bg-red-50 px-1.5 py-[3px]">
-          <Text className="text-[10px] font-extrabold text-red-600">-{product.discount}%</Text>
-        </View>
+        {hasImage ? (
+          <Image
+            source={{ uri: product.image }}
+            style={[styles.productImage, imageStyle]}
+            onError={() => setImageFailed(true)}
+          />
+        ) : (
+          <View style={[styles.productImage, styles.imageFallback, imageStyle]}>
+            <Icon name="image-outline" size={32} color="#94A3B8" />
+            <Text style={styles.imageFallbackText}>Image unavailable</Text>
+          </View>
+        )}
+        {discount > 0 ? (
+          <View className="absolute left-[7px] top-[7px] rounded-md bg-red-50 px-1.5 py-[3px]">
+            <Text className="text-[10px] font-extrabold text-red-600">-{discount}%</Text>
+          </View>
+        ) : null}
         <FavoriteButton active={wishlisted} onPress={onWishlist} />
       </View>
       <Text numberOfLines={2} className="mt-2 text-[13px] font-semibold leading-[18px] text-ink">
-        {product.name}
+        {product.name || 'Untitled product'}
       </Text>
       <Text className="mt-[5px] text-[15px] font-extrabold text-ink">{money(product.price)}</Text>
       <View className="mt-[5px] flex-row">
-        <Rating value={product.rating} />
-        <Text className="text-[11px] text-gray-500"> {product.sold}</Text>
+        <Rating value={product.rating || '—'} />
+        <Text className="text-[11px] text-gray-500"> {product.sold || 'New'}</Text>
       </View>
-      <Text className="mt-1 text-[11px] text-gray-500">{product.location}</Text>
+      <Text className="mt-1 text-[11px] text-gray-500">
+        {product.location || product.store || 'Marketplace'}
+      </Text>
     </Pressable>
   );
 }
@@ -197,8 +203,18 @@ function FavoriteButton({ active, onPress }) {
   const handlePress = (event) => {
     event.stopPropagation();
     Animated.sequence([
-      Animated.spring(scale, { toValue: 1.28, useNativeDriver: true, speed: 30, bounciness: 8 }),
-      Animated.spring(scale, { toValue: 1, useNativeDriver: true, speed: 24, bounciness: 5 }),
+      Animated.spring(scale, {
+        toValue: 1.28,
+        useNativeDriver: supportsNativeDriver,
+        speed: 30,
+        bounciness: 8,
+      }),
+      Animated.spring(scale, {
+        toValue: 1,
+        useNativeDriver: supportsNativeDriver,
+        speed: 24,
+        bounciness: 5,
+      }),
     ]).start();
     onPress?.();
   };
@@ -288,7 +304,7 @@ export function Skeleton({ width = '100%', height = 16, style }) {
   return <View accessibilityLabel="Memuat" style={[styles.skeleton, { width, height }, style]} />;
 }
 
-export function Toast({ message, visible }) {
+export function Toast({ message, visible, tone = 'success' }) {
   const translateY = useRef(new Animated.Value(24)).current;
   const opacity = useRef(new Animated.Value(0)).current;
   useEffect(() => {
@@ -296,17 +312,31 @@ export function Toast({ message, visible }) {
     translateY.setValue(24);
     opacity.setValue(0);
     Animated.parallel([
-      Animated.timing(opacity, { toValue: 1, duration: 180, useNativeDriver: true }),
-      Animated.spring(translateY, { toValue: 0, useNativeDriver: true, speed: 20, bounciness: 4 }),
+      Animated.timing(opacity, {
+        toValue: 1,
+        duration: 180,
+        useNativeDriver: supportsNativeDriver,
+      }),
+      Animated.spring(translateY, {
+        toValue: 0,
+        useNativeDriver: supportsNativeDriver,
+        speed: 20,
+        bounciness: 4,
+      }),
     ]).start();
   }, [opacity, translateY, visible]);
   if (!visible) return null;
+  const isError = tone === 'error';
   return (
     <Animated.View
       accessibilityLiveRegion="polite"
-      style={[styles.toast, { opacity, transform: [{ translateY }] }]}
+      style={[styles.toast, isError && styles.toastError, { opacity, transform: [{ translateY }] }]}
     >
-      <Icon name="checkmark-circle" size={18} color="#6EE7B7" />
+      <Icon
+        name={isError ? 'alert-circle' : 'checkmark-circle'}
+        size={18}
+        color={isError ? '#FECACA' : '#6EE7B7'}
+      />
       <Text style={styles.toastText}>{message}</Text>
     </Animated.View>
   );
@@ -399,6 +429,13 @@ const styles = StyleSheet.create({
     elevation: 2,
   },
   productImage: { width: '100%', height: 146, borderRadius: 11, backgroundColor: '#E5E7EB' },
+  imageFallback: {
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 6,
+    backgroundColor: '#F1F5F9',
+  },
+  imageFallbackText: { color: '#64748B', fontSize: 11, fontWeight: '600' },
   discount: {
     position: 'absolute',
     left: 7,
@@ -522,6 +559,7 @@ const styles = StyleSheet.create({
     shadowRadius: 14,
     elevation: 6,
   },
+  toastError: { backgroundColor: '#B91C1C' },
   toastIcon: { color: '#6EE7B7', fontWeight: '900' },
   toastText: { color: '#fff', fontWeight: '700', fontSize: 13 },
   sheetBackdrop: {

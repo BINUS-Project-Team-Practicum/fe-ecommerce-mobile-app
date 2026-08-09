@@ -9,9 +9,11 @@ export function ReferenceProduct({ product, onPress, wishlisted, onWish }) {
     <Pressable onPress={onPress} style={styles.referenceProduct}>
       <View>
         <Image source={{ uri: product.image }} style={styles.referenceProductImage} />
-        <View style={styles.referenceDiscount}>
-          <Text style={styles.referenceDiscountText}>-{product.discount}%</Text>
-        </View>
+        {Number(product.discount) > 0 ? (
+          <View style={styles.referenceDiscount}>
+            <Text style={styles.referenceDiscountText}>-{product.discount}%</Text>
+          </View>
+        ) : null}
         <Pressable
           onPress={(e) => {
             e.stopPropagation();
