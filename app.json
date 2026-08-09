@@ -1,7 +1,7 @@
 {
   "expo": {
     "name": "Binus Marketplace",
-    "slug": "ecommerce-marketplace",
+    "slug": "bion-tk-marketplace",
     "scheme": "binus-marketplace",
     "icon": "./src/public/binus-marketplace-app-icon.png",
     "version": "1.0.0",
@@ -12,7 +12,9 @@
       "resizeMode": "contain",
       "backgroundColor": "#0CC7A4"
     },
-    "assetBundlePatterns": ["**/*"],
+    "assetBundlePatterns": [
+      "**/*"
+    ],
     "ios": {
       "supportsTablet": true,
       "bundleIdentifier": "com.ardanimith.ecommercemarketplace"
@@ -27,12 +29,14 @@
     "web": {
       "bundler": "metro"
     },
-    "plugins": ["expo-asset"],
+    "plugins": [
+      "expo-asset"
+    ],
     "extra": {
       "eas": {
-        "projectId": "d1262dd9-9728-4d8a-8371-8d2d66715b26"
+        "projectId": "aa3000f6-71f2-4226-bc79-138b70529f8d"
       }
     },
-    "owner": "ardanimith"
+    "owner": "loenk2xs-team"
   }
 }
