@@ -1,22 +1,30 @@
 import { Platform } from 'react-native';
+import * as Device from 'expo-device';
 
 const REQUEST_TIMEOUT_MS = 15_000;
 
 function resolveApiUrl() {
   const configuredUrl = process.env.EXPO_PUBLIC_API_URL;
+  if (!configuredUrl) return configuredUrl;
+
+  // Hosted HTTPS backends work identically on every platform and must not be rewritten.
+  const isLocalDevelopmentHost = /^https?:\/\/(localhost|10\.0\.2\.2|\d{1,3}(?:\.\d{1,3}){3})(?::\d+)?(?:\/|$)/.test(
+    configuredUrl,
+  );
+  if (!isLocalDevelopmentHost) return configuredUrl;
+
+  const replaceHost = (host) => configuredUrl.replace(/^(https?:\/\/)[^/:]+/, `$1${host}`);
+
+  // Real phones need the computer's LAN address from .env. Do not translate it.
+  if (Device.isDevice) return configuredUrl;
 
   // Android Emulator reaches the development computer through 10.0.2.2.
-  // Web and iOS Simulator can use localhost directly.
-  if (Platform.OS === 'android' && configuredUrl?.includes('://localhost')) {
-    return configuredUrl.replace('://localhost', '://10.0.2.2');
+  if (Platform.OS === 'android') {
+    return replaceHost('10.0.2.2');
   }
 
-  // Supports existing Android Emulator development configurations too.
-  if (Platform.OS === 'ios' && configuredUrl?.includes('://10.0.2.2')) {
-    return configuredUrl.replace('://10.0.2.2', '://localhost');
-  }
-
-  return configuredUrl;
+  // Website and iOS Simulator run on the same development computer.
+  return replaceHost('localhost');
 }
 
 const API_URL = resolveApiUrl();
