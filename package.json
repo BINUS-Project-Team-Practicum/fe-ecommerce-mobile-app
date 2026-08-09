@@ -10,7 +10,8 @@
     "web": "expo start --web",
     "lint": "eslint .",
     "format": "prettier --write .",
-    "format:check": "prettier --check ."
+    "format:check": "prettier --check .",
+    "icons:generate": "npm install --no-save ionicons@7 && node scripts/generate-icons.mjs ."
   },
   "dependencies": {
     "@expo/metro-runtime": "~5.0.5",
@@ -27,6 +28,7 @@
     "react-native": "0.79.6",
     "react-native-reanimated": "~3.17.4",
     "react-native-safe-area-context": "5.4.0",
+    "react-native-svg": "^15.11.2",
     "react-native-web": "^0.20.0"
   },
   "devDependencies": {

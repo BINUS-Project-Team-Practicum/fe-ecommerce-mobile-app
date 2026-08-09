@@ -1,8 +1,6 @@
 import './global.css';
 import { useEffect, useState } from 'react';
 import { SafeAreaView, StatusBar } from 'react-native';
-import { useFonts } from 'expo-font';
-import Ionicons from '@expo/vector-icons/Ionicons';
 import * as SecureStore from 'expo-secure-store';
 import {
   AuthScreen,
@@ -67,7 +65,6 @@ function serializeState({ user, cart, wishlist, orders }) {
 }
 
 export default function App() {
-  const [iconsLoaded, iconLoadError] = useFonts(Ionicons.font);
   const [stage, setStage] = useState('splash');
   const [user, setUser] = useState(null);
   const [cart, setCart] = useState([]);
@@ -234,12 +231,8 @@ export default function App() {
     await SecureStore.deleteItemAsync(STORAGE_KEY).catch(() => {});
   };
 
-  // Tunggu font Ionicons benar-benar siap. Sebelumnya ada timer 2,5 detik yang
-  // memaksa layar tampil walau font belum termuat, dan di APK mandiri timer itu
-  // sering menang — akibatnya semua ikon tergambar sebagai kotak kosong.
-  // iconLoadError tetap dibiarkan lolos supaya aplikasi tidak tertahan di splash
-  // kalau font-nya benar-benar gagal dimuat.
-  if (!iconsLoaded && !iconLoadError) return <SplashScreen />;
+  // Tidak ada lagi gerbang tunggu font di sini. Ikon sekarang berupa SVG yang
+  // ikut di dalam bundle JavaScript, jadi sudah siap begitu komponennya render.
 
   return (
     <SafeAreaView className="flex-1 bg-canvas" style={{ flex: 1, backgroundColor: '#F8FAFC' }}>
