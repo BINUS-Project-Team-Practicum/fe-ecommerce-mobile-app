@@ -51,11 +51,28 @@ for (const name of [...used]) {
 // stroke="currentColor". Ikon solid tidak punya atribut fill sama sekali,
 // sehingga akan tergambar hitam. Elemen tanpa fill diberi currentColor supaya
 // prop color pada SvgXml bisa mewarnai keduanya.
+// Tag self-closing harus ditangani terpisah. Kalau garis miring penutup ikut
+// tertangkap sebagai atribut, hasilnya <path d="..."/ fill="currentColor"> yang
+// tidak sah dan membuat ikon tidak tergambar sama sekali.
 function colorize(svg) {
-  return svg.replace(/<(path|circle|rect|ellipse)\b([^>]*)>/g, (whole, tag, attrs) => {
+  return svg.replace(/<(path|circle|rect|ellipse)\b([^>]*?)(\/?)>/g, (whole, tag, attrs, selfClosing) => {
     if (/\bfill\s*=/.test(attrs)) return whole;
-    return `<${tag}${attrs} fill="currentColor">`;
+    return `<${tag}${attrs} fill="currentColor"${selfClosing}>`;
   });
+}
+
+// Penjaga: markup yang rusak sebelumnya lolos diam-diam sampai ke APK, karena
+// SVG tidak sah tidak melempar error — ia hanya tidak menggambar apa-apa.
+function findBrokenMarkup(xml) {
+  const problems = [];
+  if (/\/\s+[a-zA-Z-]+\s*=/.test(xml)) problems.push('atribut setelah garis miring penutup');
+  if (/<(path|circle|rect|ellipse)\b[^>]*>[^<]/.test(xml.replace(/\/>/g, '/>'))) {
+    // hanya penanda kasar, tidak dijadikan kegagalan
+  }
+  const opens = (xml.match(/<(path|circle|rect|ellipse)\b/g) || []).length;
+  const closes = (xml.match(/\/>/g) || []).length + (xml.match(/<\/(path|circle|rect|ellipse)>/g) || []).length;
+  if (opens !== closes) problems.push(`jumlah tag dibuka (${opens}) tidak sama dengan yang ditutup (${closes})`);
+  return problems;
 }
 
 const entries = [];
@@ -68,6 +85,27 @@ for (const name of [...used].sort()) {
   }
   const raw = fs.readFileSync(file, 'utf8').trim().replace(/\s+/g, ' ');
   entries.push([name, colorize(raw)]);
+}
+
+// Berhenti sebelum menulis kalau ada markup yang rusak, supaya tidak terbawa
+// diam-diam sampai ke APK seperti sebelumnya.
+const broken = entries
+  .map(([name, xml]) => [name, findBrokenMarkup(xml)])
+  .filter(([, problems]) => problems.length > 0);
+
+if (broken.length) {
+  console.error(`GAGAL: ${broken.length} ikon menghasilkan markup tidak sah.`);
+  for (const [name, problems] of broken.slice(0, 10)) {
+    console.error(`  x ${name}: ${problems.join('; ')}`);
+  }
+  process.exit(1);
+}
+
+// Setiap ikon harus punya cara mewarnai, entah lewat fill atau stroke.
+const uncolorable = entries.filter(([, xml]) => !/currentColor/.test(xml)).map(([name]) => name);
+if (uncolorable.length) {
+  console.error(`GAGAL: ikon tanpa currentColor, warnanya tidak akan bisa diatur: ${uncolorable.join(', ')}`);
+  process.exit(1);
 }
 
 const header = `// BERKAS INI DIHASILKAN OTOMATIS. Jangan diedit manual.
