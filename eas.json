@@ -8,7 +8,10 @@
       "android": {
         "buildType": "apk"
       },
-      "resourceClass": "medium"
+      "resourceClass": "medium",
+      "env": {
+        "EXPO_PUBLIC_API_URL": "https://bion-marketplace-backend.onrender.com/api"
+      }
     },
     "production": {}
   }
